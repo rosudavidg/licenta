@@ -1,0 +1,6 @@
+version: "3.1"
+services:
+  backend-data:
+    image: avatario-backend-data
+    ports:
+      - "5000:5000"

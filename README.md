@@ -1,3 +1,3 @@
-## Licenta - Avatario
+# Licenta - Avatario
 
 TODO: implement me

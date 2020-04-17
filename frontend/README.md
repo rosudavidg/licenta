@@ -1,5 +1,5 @@
 # frontend
-    
+
 ## Descriere
     Interfata cu utilizatorul
 

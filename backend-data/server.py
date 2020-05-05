@@ -1,5 +1,5 @@
 from facebook_collector import facebook_collect
-from file_system import save_images
+from file_system import save_posts_images, save_albums_photos
 from flask import Flask, request, Response
 
 app = Flask(__name__)
@@ -17,7 +17,10 @@ def index():
         data = facebook_collect(token)
 
         # Salveaza imaginile asociate postarilor
-        # save_images(data)
+        save_posts_images(data)
+
+        # Salveaza pozele din albume
+        save_albums_photos(data)
 
         # TODO: salveaza metadatele in baza de date
 

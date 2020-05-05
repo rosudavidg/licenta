@@ -288,7 +288,7 @@ def collect_user_album_photos(graph, album_id):
     return photos
 
 
-def collect_user_photos(graph):
+def collect_user_albums_photos(graph):
     """Colecteaza imaginile din albumele utilizatorului"""
 
     # Colecteaza albumele utilizatorului
@@ -320,7 +320,7 @@ def facebook_collect(token):
         groups = collect_user_groups(graph)
         movies = collect_user_movies(graph)
         books = collect_user_books(graph)
-        photos = collect_user_photos(graph)
+        albums_photos = collect_user_albums_photos(graph)
 
         data = {
             'profile': profile,
@@ -332,7 +332,7 @@ def facebook_collect(token):
             'groups': groups,
             'movies': movies,
             'books': books,
-            'photos': photos
+            'albums_photos': albums_photos
         }
 
         return data

@@ -4,3 +4,5 @@ services:
     image: avatario-backend-data
     ports:
       - "5000:5000"
+    # TODO: remove next line
+    volumes: ["./backend-data:/usr/src/app/"]

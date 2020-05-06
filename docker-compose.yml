@@ -1,7 +1,9 @@
 version: "3.1"
 services:
   backend-data:
-    image: avatario-backend-data
+    build:
+      dockerfile: Dockerfile
+      context: ./backend-data
     ports:
       - "5000:5000"
     # TODO: remove next line

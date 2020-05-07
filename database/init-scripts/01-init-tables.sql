@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS users_languages (
 
 -- Tabela pentru genurile muzicale
 CREATE TABLE IF NOT EXISTS music_genres (
-    -- Id al utilizatorului
+    -- Id al genului muzical
     id SERIAL PRIMARY KEY,
     -- Numele limbii
     genre VARCHAR (64) NOT NULL,

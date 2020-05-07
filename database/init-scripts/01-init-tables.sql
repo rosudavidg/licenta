@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR (64) NOT NULL,
     -- Numele de familie
     last_name VARCHAR (64) NOT NULL,
-    -- Locatia actuala
+    -- Orasul actual
     location VARCHAR (64),
     -- Genul
     gender VARCHAR (16),
@@ -20,4 +20,42 @@ CREATE TABLE IF NOT EXISTS users (
     ready BOOLEAN DEFAULT FALSE,
     -- Data la care s-a inregistrat pe platforma
     timestamp_created TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabela pentru limbile cunoscute de catre utilizatori
+CREATE TABLE IF NOT EXISTS languages (
+    -- Id unic al limbii
+    id INTEGER PRIMARY KEY,
+    -- Numele limbii
+    name VARCHAR (64) NOT NULL
+);
+
+-- Tabela pentru asocierile dintre utilizatori si limbi
+CREATE TABLE IF NOT EXISTS users_languages (
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Id al limbii
+    language_id INTEGER REFERENCES languages(id),
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, language_id)
+);
+
+-- Tabela pentru genurile muzicale
+CREATE TABLE IF NOT EXISTS music_genres (
+    -- Id al utilizatorului
+    id SERIAL PRIMARY KEY,
+    -- Numele limbii
+    genre VARCHAR (64) NOT NULL,
+    -- Lista de tag-uri care definesc acest gen (elemente separate prin virgula)
+    tags VARCHAR (256) NOT NULL
+);
+
+-- Tabela pentru asocierile dintre utilizatori si muzica
+CREATE TABLE IF NOT EXISTS users_music_genres (
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Id-ul genului muzical
+    music_genre_id INTEGER REFERENCES music_genres(id),
+    -- Data la care a fost apeciata intrarea
+    created_time TIMESTAMP NOT NULL
 );

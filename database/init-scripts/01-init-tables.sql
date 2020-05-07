@@ -59,3 +59,15 @@ CREATE TABLE IF NOT EXISTS users_music_genres (
     -- Data la care a fost apeciata intrarea
     created_time TIMESTAMP NOT NULL
 );
+
+-- Tabela pentru imagini
+CREATE TABLE IF NOT EXISTS images (
+    -- Id al imaginii
+    id INTEGER PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Calea absoluta la care se afla imaginea
+    path VARCHAR (128) NOT NULL,
+    -- Data la care a fost adaugata imaginea
+    created_time TIMESTAMP NOT NULL
+);

@@ -8,3 +8,25 @@ services:
       - "5000:5000"
     # TODO: remove next line
     volumes: ["./backend-data:/usr/src/app/"]
+  database:
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/secret_database_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/secret_database_password
+      POSTGRES_DB_FILE: /run/secrets/secret_database_db
+    secrets:
+      - secret_database_user
+      - secret_database_password
+      - secret_database_db
+    # TODO: remove next two line
+    ports:
+      - "54321:5432"
+secrets:
+  secret_database_password:
+    file: ./secrets/secret_database_password
+  secret_database_user:
+    file: ./secrets/secret_database_user
+  secret_database_db:
+    file: ./secrets/secret_database_db

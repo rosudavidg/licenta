@@ -159,5 +159,23 @@ CREATE TABLE IF NOT EXISTS pages (
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL,
     -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    PRIMARY KEY (user_id, id, page_category_id)
+);
+
+-- Tabela pentru definirea tipurilor de actiuni (evenimente)
+CREATE TABLE IF NOT EXISTS logs_types (
+    -- Id al tipului
+    id SERIAL PRIMARY KEY,
+    -- Numele actiunii
+    name VARCHAR (64) NOT NULL
+);
+
+-- Tabela pentru a tine evidenta log-urilor
+CREATE TABLE IF NOT EXISTS logs (
+    -- Id al userului care a initiat evenimentul
+    user_id INTEGER REFERENCES users(id),
+    -- Tipul log-ului
+    log_type_id INTEGER REFERENCES logs_types(id),
+    -- Data la care s-a inregistrat log-ul
+    timestamp_created TIMESTAMP DEFAULT NOW()
 );

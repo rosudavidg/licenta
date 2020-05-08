@@ -85,9 +85,43 @@ CREATE TABLE IF NOT EXISTS accounts_categories (
 -- Tabela pentru conturile administrate de catre utilizator
 CREATE TABLE IF NOT EXISTS accounts (
     -- Id al contului
-    id INTEGER PRIMARY KEY,
+    id INTEGER NOT NULL,
     -- Id al utilizatorului
     user_id INTEGER REFERENCES users(id),
     -- Id-ul genului muzical
-    account_category_id INTEGER REFERENCES accounts_categories(id)
+    account_category_id INTEGER REFERENCES accounts_categories(id),
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
+);
+
+-- Tabela pentru echipele apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS favorite_teams (
+    -- Id al echipei
+    id INTEGER NOT NULL,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
+);
+
+-- Tabela pentru atletii apreciati de catre utilizator
+CREATE TABLE IF NOT EXISTS favorite_athletes (
+    -- Id al atletului
+    id INTEGER NOT NULL,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
+);
+
+-- Tabela pentru grupurile din care utilizatorul face parte
+CREATE TABLE IF NOT EXISTS groups (
+    -- Id al grupului
+    id INTEGER NOT NULL,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL,
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
 );

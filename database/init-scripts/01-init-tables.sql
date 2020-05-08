@@ -71,3 +71,23 @@ CREATE TABLE IF NOT EXISTS images (
     -- Data la care a fost adaugata imaginea
     created_time TIMESTAMP NOT NULL
 );
+
+-- Tabela pentru tipurile de cont pe care utilizatorul le administreaza
+CREATE TABLE IF NOT EXISTS accounts_categories (
+    -- Id al tipului contului
+    id SERIAL PRIMARY KEY,
+    -- Numele categoriei
+    category VARCHAR (64) NOT NULL,
+    -- Lista de tag-uri care definesc categoria (elemente separate prin virgula)
+    tags VARCHAR (256) NOT NULL
+);
+
+-- Tabela pentru conturile administrate de catre utilizator
+CREATE TABLE IF NOT EXISTS accounts (
+    -- Id al contului
+    id INTEGER PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Id-ul genului muzical
+    account_category_id INTEGER REFERENCES accounts_categories(id)
+);

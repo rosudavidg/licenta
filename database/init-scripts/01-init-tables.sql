@@ -125,3 +125,15 @@ CREATE TABLE IF NOT EXISTS groups (
     -- Constrangere pentru cheia primara
     PRIMARY KEY (user_id, id)
 );
+
+-- Tabela pentru jocurile apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS games (
+    -- Id al jocului
+    id INTEGER NOT NULL,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL,
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
+);

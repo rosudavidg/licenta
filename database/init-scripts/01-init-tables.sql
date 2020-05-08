@@ -137,3 +137,27 @@ CREATE TABLE IF NOT EXISTS games (
     -- Constrangere pentru cheia primara
     PRIMARY KEY (user_id, id)
 );
+
+-- Tabela pentru categoriile paginilor apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS pages_categories (
+    -- Id al categoriei
+    id SERIAL PRIMARY KEY,
+    -- Numele categoriei
+    category VARCHAR (64) NOT NULL,
+    -- Lista de tag-uri care definesc categoria (elemente separate prin virgula)
+    tags VARCHAR (256) NOT NULL
+);
+
+-- Tabela pentru paginile apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS pages (
+    -- Id al paginii
+    id INTEGER NOT NULL,
+    -- Id al utilizatorului
+    user_id INTEGER REFERENCES users(id),
+    -- Id al categoriei paginii
+    page_category_id INTEGER REFERENCES pages_categories(id),
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL,
+    -- Constrangere pentru cheia primara
+    PRIMARY KEY (user_id, id)
+);

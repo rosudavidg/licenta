@@ -7,7 +7,11 @@ services:
     ports:
       - "5000:5000"
     # TODO: remove next line
-    volumes: ["./backend-data:/usr/src/app/"]
+    volumes:
+      - ./backend-data:/usr/src/app/
+      - volume_backend_data:/images
+    networks:
+      - webnetwork
   database:
     build:
       dockerfile: Dockerfile
@@ -23,6 +27,10 @@ services:
     # TODO: remove next two line
     ports:
       - "54321:5432"
+    networks:
+      - webnetwork
+volumes:
+  volume_backend_data:
 secrets:
   secret_database_password:
     file: ./secrets/secret_database_password
@@ -30,3 +38,5 @@ secrets:
     file: ./secrets/secret_database_user
   secret_database_db:
     file: ./secrets/secret_database_db
+networks:
+  webnetwork:

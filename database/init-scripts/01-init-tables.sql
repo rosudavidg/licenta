@@ -1,7 +1,7 @@
 -- Tabela pentru utilizatori
 CREATE TABLE IF NOT EXISTS users (
     -- Id unic al unui utilizator
-    id INTEGER PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     -- Email
     email VARCHAR (50) NOT NULL,
     -- Prenume
@@ -178,4 +178,13 @@ CREATE TABLE IF NOT EXISTS logs (
     log_type_id INTEGER REFERENCES logs_types(id),
     -- Data la care s-a inregistrat log-ul
     timestamp_created TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS persons (
+    -- Id al persoanei
+    id SERIAL PRIMARY KEY,
+    -- Id al utilizatorului (poate fi NULL)
+    user_id INTEGER REFERENCES users(id),
+    -- Embedding pentru face recognition
+    embedding BYTEA NOT NULL
 );

@@ -1,25 +1,34 @@
 # Imaginea de baza alpine
-FROM alpine:edge
+FROM ubuntu:bionic
 
-# Actualizare pip
-RUN apk add --update py-pip
+# Instalare utilitare
+RUN apt-get update && apt-get install -y \
+    git \
+    python3.7 \
+    python3-pip \
+    libsm6 libxext6 libxrender-dev
+
+# Instalare opencv
+RUN pip3 install opencv-python
+
+# Instalare Keras VGGFace
+RUN pip3 install git+https://github.com/rcmalli/keras-vggface.git
 
 # Copiere fisier dependinte
 COPY requirements.txt /usr/src/app/
 
 # Instalare dependinte
-RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt
+RUN pip3 install tensorflow
+RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt
 
 # Copiere aplicatie
-COPY server.py /usr/src/app/
-COPY facebook_collector.py /usr/src/app/
-COPY file_system.py /usr/src/app/
+COPY *.py /usr/src/app/
 
 # Adaugare cale pentru salvare imagini
-RUN mkdir images /
+RUN mkdir /images
 
 # Expunerea portului pe care ruleaza serviciul
 EXPOSE 5000
 
 # Rularea serviciului
-CMD ["python3", "/usr/src/app/server.py"]
+CMD ["python3", "-W", "ignore", "/usr/src/app/server.py"]

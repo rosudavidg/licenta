@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS languages (
 -- Tabela pentru asocierile dintre utilizatori si limbi
 CREATE TABLE IF NOT EXISTS users_languages (
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Id al limbii
     language_id INTEGER REFERENCES languages(id),
     -- Constrangere pentru cheia primara
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS music_genres (
 -- Tabela pentru asocierile dintre utilizatori si muzica
 CREATE TABLE IF NOT EXISTS users_music_genres (
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Id-ul genului muzical
     music_genre_id INTEGER REFERENCES music_genres(id),
     -- Data la care a fost apeciata intrarea
@@ -63,9 +63,9 @@ CREATE TABLE IF NOT EXISTS users_music_genres (
 -- Tabela pentru imagini
 CREATE TABLE IF NOT EXISTS images (
     -- Id al imaginii
-    id INTEGER PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Calea absoluta la care se afla imaginea
     path VARCHAR (128) NOT NULL,
     -- Data la care a fost adaugata imaginea
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     -- Id al contului
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Id-ul genului muzical
     account_category_id INTEGER REFERENCES accounts_categories(id),
     -- Constrangere pentru cheia primara
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS favorite_teams (
     -- Id al echipei
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Constrangere pentru cheia primara
     PRIMARY KEY (user_id, id)
 );
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS favorite_athletes (
     -- Id al atletului
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Constrangere pentru cheia primara
     PRIMARY KEY (user_id, id)
 );
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS groups (
     -- Id al grupului
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL,
     -- Constrangere pentru cheia primara
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS games (
     -- Id al jocului
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL,
     -- Constrangere pentru cheia primara
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS pages (
     -- Id al paginii
     id INTEGER NOT NULL,
     -- Id al utilizatorului
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Id al categoriei paginii
     page_category_id INTEGER REFERENCES pages_categories(id),
     -- Data la care a fost adaugata intrarea
@@ -173,18 +173,37 @@ CREATE TABLE IF NOT EXISTS logs_types (
 -- Tabela pentru a tine evidenta log-urilor
 CREATE TABLE IF NOT EXISTS logs (
     -- Id al userului care a initiat evenimentul
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Tipul log-ului
     log_type_id INTEGER REFERENCES logs_types(id),
     -- Data la care s-a inregistrat log-ul
     timestamp_created TIMESTAMP DEFAULT NOW()
 );
 
+-- Tabela ce abstractiveaza o poza regasita in imagini
 CREATE TABLE IF NOT EXISTS persons (
     -- Id al persoanei
     id SERIAL PRIMARY KEY,
     -- Id al utilizatorului (poate fi NULL)
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     -- Embedding pentru face recognition
     embedding BYTEA NOT NULL
+);
+
+-- Toate aparitiile unei persoane in poze
+CREATE TABLE IF NOT EXISTS faces (
+    -- Id al fetei
+    id SERIAL PRIMARY KEY,
+    -- Id al persoanei
+    person_id INTEGER REFERENCES persons(id),
+    -- Id-ul imaginii in care apare fata
+    image_id BIGINT REFERENCES images(id),
+    -- Cooronata x a bounding box-ului
+    x INTEGER NOT NULL,
+    -- Cooronata y a bounding box-ului
+    y INTEGER NOT NULL,
+    -- Latimea bounding box-ului
+    width INTEGER NOT NULL,
+    -- Inaltimea bounding box-ului
+    height INTEGER NOT NULL
 );

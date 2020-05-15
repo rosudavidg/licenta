@@ -1,3 +1,4 @@
+-- Adaugarea in baza de date a cuvintelor uzuale
 INSERT INTO common_words (word) VALUES ('adevar');
 INSERT INTO common_words (word) VALUES ('albina');
 INSERT INTO common_words (word) VALUES ('algebra');

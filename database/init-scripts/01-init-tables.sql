@@ -227,3 +227,11 @@ CREATE TABLE IF NOT EXISTS likes (
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL
 );
+
+-- Tabela pentru cuvinte uzuale
+CREATE TABLE IF NOT EXISTS common_words (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Cuvantul
+    word VARCHAR (64) NOT NULL
+);

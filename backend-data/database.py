@@ -331,3 +331,19 @@ def insert_languages(connection, data):
         connection.rollback()
 
     cursor.close()
+
+
+def get_face(connection, id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT images.path, faces.x, faces.y, faces.width, faces.height FROM faces JOIN images ON faces.image_id = images.id WHERE faces.id = %s")
+    val = (id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchone()
+    except:
+        connection.rollback()
+        return None

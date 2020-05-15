@@ -1,10 +1,12 @@
 from facebook_collector import facebook_collect
 from file_system import save_posts_images, save_albums_photos
 from face_api import get_persons
-from flask import Flask, request, Response
+from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images
 import pickle
 import database
+import cv2
+import base64
 
 app = Flask(__name__)
 
@@ -85,6 +87,31 @@ def index():
         return Response.status_code(500)
 
     return Response.status_code(201)
+
+
+@app.route('/face/<id>', methods=['GET'])
+def get_face(id):
+    # Aduce detaliile despre fata si imagine din baza de date
+    face = database.get_face(db_connection, id)
+
+    # Daca fata nu a fost gasita
+    if face == None:
+        return Response(f"Face with id {id} not found.", status=401, mimetype='application/json')
+
+    path, x, y, width, height = face
+
+    # Aduce imaginea in memorie
+    image = cv2.imread(path)
+
+    # Adauga bounding box
+    cv2.rectangle(image, (x, y), (x + width, y + height), (76, 231, 255), 4)
+
+    # Encodeaza imaginea pentru a o putea trimite
+    retval, buffer = cv2.imencode('.png', image)
+    response = base64.b64encode(buffer)
+
+    # Trimite imaginea
+    return response
 
 
 if __name__ == "__main__":

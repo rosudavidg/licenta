@@ -1,17 +1,26 @@
 version: "3.1"
 services:
   backend-data:
+    depends_on:
+      - database
     build:
       dockerfile: Dockerfile
       context: ./backend-data
     ports:
       - "5000:5000"
-    # TODO: remove next line
     volumes:
       - ./backend-data:/usr/src/app/
       - volume_backend_data:/images
     networks:
       - webnetwork
+    environment:
+      DATABASE_USER: /run/secrets/secret_database_user
+      DATABASE_PASSWORD: /run/secrets/secret_database_password
+      DATABASE_DB: /run/secrets/secret_database_db
+    secrets:
+      - secret_database_user
+      - secret_database_password
+      - secret_database_db
   database:
     build:
       dockerfile: Dockerfile
@@ -24,11 +33,12 @@ services:
       - secret_database_user
       - secret_database_password
       - secret_database_db
-    # TODO: remove next two line
     ports:
       - "54321:5432"
     networks:
       - webnetwork
+networks:
+  webnetwork:
 volumes:
   volume_backend_data:
 secrets:
@@ -38,5 +48,3 @@ secrets:
     file: ./secrets/secret_database_user
   secret_database_db:
     file: ./secrets/secret_database_db
-networks:
-  webnetwork:

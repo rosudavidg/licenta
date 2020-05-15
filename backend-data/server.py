@@ -79,8 +79,6 @@ def index():
         # Adauga persoanele noi in baza de date
         database.insert_persons(db_connection, persons, data['profile']['id'])
 
-        # TODO: salveaza metadatele in baza de date
-
         return Response("Successfully created", status=201, mimetype='application/json')
 
     except:

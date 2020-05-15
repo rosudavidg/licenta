@@ -11,14 +11,16 @@ RUN apt-get update && apt-get install -y \
 # Instalare opencv
 RUN pip3 install opencv-python
 
-# Instalare Keras VGGFace
+# # Instalare Keras VGGFace
 RUN pip3 install git+https://github.com/rcmalli/keras-vggface.git
+
+# Instalare tensorflow
+RUN pip3 install tensorflow
 
 # Copiere fisier dependinte
 COPY requirements.txt /usr/src/app/
 
 # Instalare dependinte
-RUN pip3 install tensorflow
 RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt
 
 # Copiere aplicatie

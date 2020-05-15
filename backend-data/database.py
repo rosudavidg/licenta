@@ -1,14 +1,17 @@
 import psycopg2
 import pickle
 import re
+from get_docker_secret import get_docker_secret
+import os
 
 
 def create_database_connection():
-    connection = psycopg2.connect(user="backend",
-                                  password="this-is-my-SuP3r-S3Cre7-p4ssword",
+    connection = psycopg2.connect(user=get_docker_secret(os.environ['DATABASE_USER']),
+                                  password=get_docker_secret(
+                                      os.environ['DATABASE_PASSWORD']),
                                   host="database",
                                   port="5432",
-                                  database="avatario_db")
+                                  database=get_docker_secret(os.environ['DATABASE_DB']))
 
     return connection
 

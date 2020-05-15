@@ -3,6 +3,7 @@ import pickle
 import re
 from get_docker_secret import get_docker_secret
 import os
+from face_api import is_match
 
 
 def create_database_connection():
@@ -347,3 +348,63 @@ def get_face(connection, id):
     except:
         connection.rollback()
         return None
+
+
+def insert_known_persons(connection, persons, user_id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT id, embedding FROM persons")
+    sql_images = ("SELECT id FROM images WHERE path = %s")
+    sql_insert = (
+        "INSERT INTO faces (person_id, image_id, x, y, width, height) VALUES (%s, %s, %s, %s, %s, %s)")
+
+    try:
+        cursor.execute(sql)
+        connection.commit()
+
+        db_persons = cursor.fetchall()
+
+        rest_persons = []
+
+        for person in persons:
+            db_person_match = None
+
+            for db_person in db_persons:
+                if is_match(person['embedding'], pickle.loads(db_person[1]), 0.5):
+                    print('match')
+                    db_person_match = db_person
+                    break
+
+            if db_person_match != None:
+                for face in person['faces']:
+                    image_id = 0
+
+                    try:
+                        val_images = (face['filename'], )
+                        cursor.execute(sql_images, val_images)
+                        connection.commit()
+
+                        image_id = cursor.fetchone()[0]
+                    except:
+                        connection.rollback()
+                        continue
+
+                    val_insert = (
+                        db_person[0], image_id, face['x'], face['y'], face['width'], face['height'])
+
+                    try:
+                        cursor.execute(sql_insert, val_insert)
+                        connection.commit()
+                    except:
+                        connection.rollback()
+                        continue
+                pass
+            else:
+                rest_persons.append(person)
+
+        return rest_persons
+
+    except Exception as e:
+        print(f'error {str(e)}')
+        connection.rollback()
+        return persons

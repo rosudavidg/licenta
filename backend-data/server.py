@@ -57,17 +57,17 @@ def index():
         # Adauga atletii apreciati de catre utilizator
         database.insert_favorite_athletes(db_connection, data)
 
-       # Adauga echipele sportive apreciate de catre utilizator
+        # Adauga echipele sportive apreciate de catre utilizator
         database.insert_favorite_teams(db_connection, data)
 
-       # Adauga limbile cunoscute de catre utilizator
+        # Adauga limbile cunoscute de catre utilizator
         database.insert_languages(db_connection, data)
-
-        # Extrage caile catre toate pozele
-        all_image_paths = get_all_image_paths(data)
 
         # Extrage toate imaginile (cu created_time)
         images = get_all_images(data)
+
+        # Extrage caile catre toate pozele
+        all_image_paths = get_all_image_paths(data)
 
         # Adauga toate imaginile in baza de date
         database.insert_images(db_connection, images,
@@ -76,10 +76,13 @@ def index():
         # Detectez persoanele din imagini
         persons = get_persons(all_image_paths)
 
-        # TODO: verifica persoanele deja existente (elimina din persons + adauga faces in DB)
+        # Incearca potrivirea persoanelor noi cu cele deja existente
+        persons_rest = database.insert_known_persons(
+            db_connection, persons, data['profile']['id'])
 
         # Adauga persoanele noi in baza de date
-        database.insert_persons(db_connection, persons, data['profile']['id'])
+        database.insert_persons(
+            db_connection, persons_rest, data['profile']['id'])
 
         return Response("Successfully created", status=201, mimetype='application/json')
 
@@ -91,6 +94,11 @@ def index():
 
 @app.route('/face/<id>', methods=['GET'])
 def get_face(id):
+    """
+    Intoarce imaginea care contine fata cu id-ul <id>,
+    cu un bounding box care scoate in evidenta fata respectiva
+    """
+
     # Aduce detaliile despre fata si imagine din baza de date
     face = database.get_face(db_connection, id)
 

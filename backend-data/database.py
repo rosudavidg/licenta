@@ -408,3 +408,21 @@ def insert_known_persons(connection, persons, user_id):
         print(f'error {str(e)}')
         connection.rollback()
         return persons
+
+
+def insert_posts(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO posts (user_id, post_type, message, created_time) VALUES (%s, %s, %s, %s)")
+    vals = [(user_id, 1, post['message'], post['created_time'])
+            for post in data['posts'] if 'message' in post]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

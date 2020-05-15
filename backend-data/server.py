@@ -63,6 +63,9 @@ def index():
         # Adauga limbile cunoscute de catre utilizator
         database.insert_languages(db_connection, data)
 
+        # Adauga postarile care contin mesaj
+        database.insert_posts(db_connection, data)
+
         # Extrage toate imaginile (cu created_time)
         images = get_all_images(data)
 

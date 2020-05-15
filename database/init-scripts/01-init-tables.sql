@@ -235,3 +235,21 @@ CREATE TABLE IF NOT EXISTS common_words (
     -- Cuvantul
     word VARCHAR (64) NOT NULL
 );
+
+-- Tabela pentru tipurile de postari
+CREATE TABLE IF NOT EXISTS post_types (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Tipul
+    name VARCHAR (64) NOT NULL
+);
+
+-- Tabela pentru postari
+CREATE TABLE IF NOT EXISTS posts (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Tipul
+    post_type INTEGER REFERENCES post_types(id),
+    -- Textul postarii
+    message TEXT
+);

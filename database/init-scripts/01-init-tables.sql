@@ -250,6 +250,10 @@ CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     -- Tipul
     post_type INTEGER REFERENCES post_types(id),
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
     -- Textul postarii
-    message TEXT
+    message TEXT,
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL
 );

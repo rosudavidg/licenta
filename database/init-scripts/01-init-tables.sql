@@ -3,11 +3,11 @@ CREATE TABLE IF NOT EXISTS users (
     -- Id unic al unui utilizator
     id BIGINT PRIMARY KEY,
     -- Email
-    email VARCHAR (50) NOT NULL,
+    email VARCHAR (50),
     -- Prenume
-    first_name VARCHAR (64) NOT NULL,
+    first_name VARCHAR (64),
     -- Numele de familie
-    last_name VARCHAR (64) NOT NULL,
+    last_name VARCHAR (64),
     -- Orasul actual
     location VARCHAR (64),
     -- Genul
@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS users_music_genres (
     user_id BIGINT REFERENCES users(id),
     -- Id-ul genului muzical
     music_genre_id INTEGER REFERENCES music_genres(id),
+    -- Numele
+    name VARCHAR (128) NOT NULL,
     -- Data la care a fost apeciata intrarea
     created_time TIMESTAMP NOT NULL
 );

@@ -22,11 +22,17 @@ def index():
         # Colectez datele din profilul utilizatorului
         data = facebook_collect(token)
 
-        # Salveaza imaginile asociate postarilor
+        # Salveaza imaginile asociate postarilor (pe disk)
         # save_posts_images(data)
 
-        # Salveaza pozele din albume
+        # Salveaza pozele din albume (pe disk)
         # save_albums_photos(data)
+
+        # Salvez profilul utilizatorului
+        database.insert_profile(db_connection, data['profile'])
+
+        # Adaug aprecierile muzicale
+        database.insert_music(db_connection, data)
 
         # Extrage caile catre toate pozele
         all_image_paths = get_all_image_paths(data)

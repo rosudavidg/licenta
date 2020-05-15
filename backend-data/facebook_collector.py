@@ -66,7 +66,7 @@ def collect_user_music(graph):
         # Cerere Facebook API
         res = graph.get_object(
             'me/music',
-            fields='genre,created_time',
+            fields='genre,created_time,name',
             limit=LIMIT,
             after=cursors_after
         )

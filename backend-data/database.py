@@ -1,5 +1,6 @@
 import psycopg2
 import pickle
+import re
 
 
 def create_database_connection():
@@ -71,4 +72,97 @@ def insert_images(connection, images, user_id):
     except:
         connection.rollback()
 
+    cursor.close()
+
+
+def insert_profile(connection, profile):
+    user_id = profile['id']
+
+    email = None
+    first_name = None
+    last_name = None
+    location = None
+    gender = None
+    birthday = None
+    hometown = None
+
+    try:
+        email = profile['email']
+    except:
+        pass
+    try:
+        first_name = profile['first_name']
+    except:
+        pass
+    try:
+        last_name = profile['last_name']
+    except:
+        pass
+    try:
+        location = profile['location']['name']
+    except:
+        pass
+    try:
+        gender = profile['gender']
+    except:
+        pass
+    try:
+        birthday = profile['birthday']
+    except:
+        pass
+    try:
+        hometown = profile['hometown']['name']
+    except:
+        pass
+
+    cursor = connection.cursor()
+
+    sql = ("UPDATE users SET email = %s, first_name = %s, last_name = %s, location = %s, gender = %s, birthday = %s, hometown = %s, id = %s")
+    val = (email, first_name, last_name, location,
+           gender, birthday, hometown, user_id)
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_music(connection, data):
+    cursor = connection.cursor()
+
+    sql_genres = ("SELECT * FROM music_genres")
+    sql_insert = (
+        "INSERT INTO users_music_genres (user_id, music_genre_id, name, created_time) VALUES (%s, %s, %s, %s)")
+
+    try:
+        cursor.execute(sql_genres)
+        connection.commit()
+    except:
+        connection.rollback()
+        return
+
+    music_genres = cursor.fetchall()
+
+    user_id = data['profile']['id']
+    music = data['music']
+
+    for e in music:
+        for genre in music_genres:
+            genre_tags = list(filter(lambda x: len(
+                x) > 0, re.split(',| ', genre[2])))
+
+            e_tags = list(filter(lambda x: len(x) > 0, list(
+                map(lambda x: x.lower(), re.split(' |&|,|-|/', e['genre'])))))
+
+            if len(set(genre_tags).intersection(set(e_tags))) > 0:
+                val = (user_id, genre[0], e['name'], e['created_time'])
+
+                try:
+                    cursor.execute(sql_insert, val)
+                    connection.commit()
+                except:
+                    connection.rollback()
     cursor.close()

@@ -1,5 +1,6 @@
 from keras_vggface.utils import preprocess_input
 from keras_vggface.vggface import VGGFace
+from keras.models import model_from_json
 from mtcnn.mtcnn import MTCNN
 from scipy.spatial.distance import cosine
 from numpy import asarray
@@ -97,8 +98,14 @@ def get_persons(filenames):
     detector = MTCNN(min_face_size=50)
 
     # Modelul utilizat pentru embedding
-    model = VGGFace(model='resnet50', include_top=False,
-                    input_shape=(224, 224, 3), pooling='avg')
+    # model = VGGFace(model='resnet50', include_top=False,
+    #                 input_shape=(224, 224, 3), pooling='avg')
+
+    json_file = open('/user/src/app/face_model.json', 'r')
+    model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(model_json)
+    model.load_weights("/user/src/app/face_model.h5")
 
     faces = []
 

@@ -24,6 +24,9 @@ RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt
 # Copiere aplicatie
 COPY *.py /usr/src/app/
 
+# Copiere modele
+COPY *_model.* /user/src/app/
+
 # Adaugare cale pentru salvare imagini
 RUN mkdir /images
 

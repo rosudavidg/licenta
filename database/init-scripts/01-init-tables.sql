@@ -131,13 +131,13 @@ CREATE TABLE IF NOT EXISTS groups (
 -- Tabela pentru jocurile apreciate de catre utilizator
 CREATE TABLE IF NOT EXISTS games (
     -- Id al jocului
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
+    -- Numele
+    name VARCHAR (64) NOT NULL,
     -- Data la care a fost adaugata intrarea
-    created_time TIMESTAMP NOT NULL,
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    created_time TIMESTAMP NOT NULL
 );
 
 -- Tabela pentru categoriile paginilor apreciate de catre utilizator

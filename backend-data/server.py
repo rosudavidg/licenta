@@ -37,6 +37,30 @@ def index():
         # Adauga jocurile apreciate
         database.insert_games(db_connection, data)
 
+        # Adauga cartile apreciate
+        database.insert_books(db_connection, data)
+
+        # Adauga filmele apreciate
+        database.insert_movies(db_connection, data)
+
+        # Adauga grupurile din care utilizatorul face parte
+        database.insert_groups(db_connection, data)
+
+        # Adauga paginile apreciate de catre utilizator
+        database.insert_likes(db_connection, data)
+
+        # Adauga paginile administrate de catre utilizator
+        database.insert_accounts(db_connection, data)
+
+        # Adauga atletii apreciati de catre utilizator
+        database.insert_favorite_athletes(db_connection, data)
+
+       # Adauga echipele sportive apreciate de catre utilizator
+        database.insert_favorite_teams(db_connection, data)
+
+       # Adauga limbile cunoscute de catre utilizator
+        database.insert_languages(db_connection, data)
+
         # Extrage caile catre toate pozele
         all_image_paths = get_all_image_paths(data)
 

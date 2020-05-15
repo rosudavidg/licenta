@@ -24,20 +24,12 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Tabela pentru limbile cunoscute de catre utilizatori
 CREATE TABLE IF NOT EXISTS languages (
-    -- Id unic al limbii
-    id INTEGER PRIMARY KEY,
-    -- Numele limbii
-    name VARCHAR (64) NOT NULL
-);
-
--- Tabela pentru asocierile dintre utilizatori si limbi
-CREATE TABLE IF NOT EXISTS users_languages (
+    -- Id
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
-    -- Id al limbii
-    language_id INTEGER REFERENCES languages(id),
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, language_id)
+    -- Numele limbii
+    name VARCHAR (64) NOT NULL
 );
 
 -- Tabela pentru genurile muzicale
@@ -74,58 +66,46 @@ CREATE TABLE IF NOT EXISTS images (
     created_time TIMESTAMP NOT NULL
 );
 
--- Tabela pentru tipurile de cont pe care utilizatorul le administreaza
-CREATE TABLE IF NOT EXISTS accounts_categories (
-    -- Id al tipului contului
-    id SERIAL PRIMARY KEY,
-    -- Numele categoriei
-    category VARCHAR (64) NOT NULL,
-    -- Lista de tag-uri care definesc categoria (elemente separate prin virgula)
-    tags VARCHAR (256) NOT NULL
-);
-
 -- Tabela pentru conturile administrate de catre utilizator
 CREATE TABLE IF NOT EXISTS accounts (
     -- Id al contului
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
-    -- Id-ul genului muzical
-    account_category_id INTEGER REFERENCES accounts_categories(id),
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    -- Numele
+    name VARCHAR (256) NOT NULL
 );
 
 -- Tabela pentru echipele apreciate de catre utilizator
 CREATE TABLE IF NOT EXISTS favorite_teams (
     -- Id al echipei
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    -- Numele
+    name VARCHAR (256) NOT NULL
 );
 
 -- Tabela pentru atletii apreciati de catre utilizator
 CREATE TABLE IF NOT EXISTS favorite_athletes (
     -- Id al atletului
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    -- Numele
+    name VARCHAR (256) NOT NULL
 );
 
 -- Tabela pentru grupurile din care utilizatorul face parte
 CREATE TABLE IF NOT EXISTS groups (
     -- Id al grupului
-    id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
+    -- Numele
+    name VARCHAR (256) NOT NULL,
     -- Data la care a fost adaugata intrarea
-    created_time TIMESTAMP NOT NULL,
-    -- Constrangere pentru cheia primara
-    PRIMARY KEY (user_id, id)
+    created_time TIMESTAMP NOT NULL
 );
 
 -- Tabela pentru jocurile apreciate de catre utilizator
@@ -135,12 +115,13 @@ CREATE TABLE IF NOT EXISTS games (
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
     -- Numele
-    name VARCHAR (64) NOT NULL,
+    name VARCHAR (256) NOT NULL,
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL
 );
 
 -- Tabela pentru categoriile paginilor apreciate de catre utilizator
+-- UNUSED
 CREATE TABLE IF NOT EXISTS pages_categories (
     -- Id al categoriei
     id SERIAL PRIMARY KEY,
@@ -151,6 +132,7 @@ CREATE TABLE IF NOT EXISTS pages_categories (
 );
 
 -- Tabela pentru paginile apreciate de catre utilizator
+-- UNUSED
 CREATE TABLE IF NOT EXISTS pages (
     -- Id al paginii
     id INTEGER NOT NULL,
@@ -208,4 +190,40 @@ CREATE TABLE IF NOT EXISTS faces (
     width INTEGER NOT NULL,
     -- Inaltimea bounding box-ului
     height INTEGER NOT NULL
+);
+
+-- Tabela pentru cartile apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS books (
+    -- Id al cartii
+    id SERIAL PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
+    -- Numele
+    name VARCHAR (256) NOT NULL,
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Tabela pentru filmele apreciate de catre utilizator
+CREATE TABLE IF NOT EXISTS movies (
+    -- Id al filmului
+    id SERIAL PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
+    -- Numele
+    name VARCHAR (256) NOT NULL,
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Tabela pentru aprecierile utilizatorului
+CREATE TABLE IF NOT EXISTS likes (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
+    -- Numele
+    name VARCHAR (256) NOT NULL,
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL
 );

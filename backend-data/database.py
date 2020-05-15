@@ -184,3 +184,147 @@ def insert_games(connection, data):
         connection.rollback()
 
     cursor.close()
+
+
+def insert_books(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO books (user_id, name, created_time) VALUES (%s, %s, %s)")
+    vals = [(user_id, book['name'], book['created_time'])
+            for book in data['books']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_movies(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO movies (user_id, name, created_time) VALUES (%s, %s, %s)")
+    vals = [(user_id, movie['name'], movie['created_time'])
+            for movie in data['movies']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_groups(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO groups (user_id, name, created_time) VALUES (%s, %s, %s)")
+    vals = [(user_id, group['name'], group['created_time'])
+            for group in data['groups']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_likes(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO likes (user_id, name, created_time) VALUES (%s, %s, %s)")
+    vals = [(user_id, like['name'], like['created_time'])
+            for like in data['likes']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_accounts(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO accounts (user_id, name) VALUES (%s, %s)")
+    vals = [(user_id, account['name'])
+            for account in data['accounts']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_favorite_athletes(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO favorite_athletes (user_id, name) VALUES (%s, %s)")
+    vals = [(user_id, athlete['name'])
+            for athlete in data['profile']['favorite_athletes']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_favorite_teams(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO favorite_teams (user_id, name) VALUES (%s, %s)")
+    vals = [(user_id, team['name'])
+            for team in data['profile']['favorite_teams']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()
+
+
+def insert_languages(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO languages (user_id, name) VALUES (%s, %s)")
+    vals = [(user_id, language['name'])
+            for language in data['profile']['languages']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

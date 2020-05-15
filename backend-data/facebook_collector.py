@@ -27,7 +27,8 @@ def collect_user_profile(graph):
     # Cerere Facebook API
     res = graph.get_object(
         'me',
-        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,sports,hometown,languages'
+        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,favorite_teams,sports,hometown,languages',
+        locale='en_GB'
     )
 
     # Adaugare set de date
@@ -43,7 +44,8 @@ def collect_user_posts(graph):
     res = graph.get_object(
         'me/posts',
         fields='id,created_time,type,full_picture,message,reactions.summary(true)',
-        limit=LIMIT
+        limit=LIMIT,
+        locale='en_GB'
     )
 
     # Adaugare set de date
@@ -68,7 +70,8 @@ def collect_user_music(graph):
             'me/music',
             fields='genre,created_time,name',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -98,7 +101,8 @@ def collect_user_games(graph):
             'me/games',
             fields='name,id,created_time',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -125,7 +129,8 @@ def collect_user_accounts(graph):
             'me/accounts',
             fields='id,name,category',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -152,7 +157,8 @@ def collect_user_likes(graph):
             'me/likes',
             fields='id,name,created_time,about',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -179,7 +185,8 @@ def collect_user_groups(graph):
             'me/groups',
             fields='id,name,created_time,description',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -206,7 +213,8 @@ def collect_user_movies(graph):
             'me/movies',
             fields='id,name,created_time,description',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -233,7 +241,8 @@ def collect_user_books(graph):
             'me/books',
             fields='id,name,created_time',
             limit=LIMIT,
-            after=cursors_after
+            after=cursors_after,
+            locale='en_GB'
         )
 
         # Adaugare set de date
@@ -255,7 +264,8 @@ def collect_user_albums(graph):
     res = graph.get_object(
         'me/albums',
         fields='created_time,id,name,count,description,location,place,type,comments',
-        limit=LIMIT
+        limit=LIMIT,
+        locale='en_GB'
     )
 
     # Adaugare set de date
@@ -275,7 +285,8 @@ def collect_user_album_photos(graph, album_id):
     res = graph.get_object(
         f'{album_id}/photos',
         fields='images,id,created_time',
-        limit=LIMIT
+        limit=LIMIT,
+        locale='en_GB'
     )
 
     # Adaugare set de date

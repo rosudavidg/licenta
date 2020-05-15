@@ -34,6 +34,9 @@ def index():
         # Adaug aprecierile muzicale
         database.insert_music(db_connection, data)
 
+        # Adauga jocurile apreciate
+        database.insert_games(db_connection, data)
+
         # Extrage caile catre toate pozele
         all_image_paths = get_all_image_paths(data)
 

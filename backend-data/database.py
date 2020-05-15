@@ -166,3 +166,21 @@ def insert_music(connection, data):
                 except:
                     connection.rollback()
     cursor.close()
+
+
+def insert_games(connection, data):
+    user_id = data['profile']['id']
+
+    cursor = connection.cursor()
+
+    sql = ("INSERT INTO games (user_id, name, created_time) VALUES (%s, %s, %s)")
+    vals = [(user_id, game['name'], game['created_time'])
+            for game in data['games']]
+
+    try:
+        cursor.executemany(sql, vals)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

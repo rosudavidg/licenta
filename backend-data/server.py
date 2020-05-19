@@ -22,7 +22,10 @@ def index():
         token = request.args.get('token')
 
         # Colectez datele din profilul utilizatorului
-        data = facebook_collect(token)
+        try:
+            data = facebook_collect(token)
+        except:
+            return Response("Facebook data collecting failed!", status=500, mimetype='application/json')
 
         # Salveaza imaginile asociate postarilor (pe disk)
         # save_posts_images(data)

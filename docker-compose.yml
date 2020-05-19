@@ -13,6 +13,24 @@ services:
       - webnetwork
     volumes:
       - ./backend-api:/usr/src/app/
+    environment:
+      BACKEND_DATA_HOST: backend-data
+      BACKEND_DATA_PORT: 5000
+      DATABASE_USER: /run/secrets/secret_database_user
+      DATABASE_HOST: database
+      DATABASE_PASSWORD: /run/secrets/secret_database_password
+      DATABASE_NAME: /run/secrets/secret_database_db
+      DATABASE_PORT: 5432
+      JWT_ISSUER: avatario_backend_api
+      JWT_SUBJECT: Authentication token
+      JWT_AUDIENCE: avatario_frontend
+      JWT_EXPIRESIN: 1w
+      JWT_SECRET_KEY: /run/secrets/secret_jwt_key
+    secrets:
+      - secret_database_user
+      - secret_database_password
+      - secret_database_db
+      - secret_jwt_key
   backend-data:
     depends_on:
       - database
@@ -61,3 +79,5 @@ secrets:
     file: ./secrets/secret_database_user
   secret_database_db:
     file: ./secrets/secret_database_db
+  secret_jwt_key:
+    file: ./secrets/secret_jwt_key

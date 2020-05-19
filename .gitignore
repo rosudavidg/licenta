@@ -7,6 +7,9 @@ __pycache__
 # Ignora directorul secrets
 secrets
 
+
 # TODO: remove next two lines
 # Ignora fisierul cu datele de test (modul development)
 test_data.py
+
+node_modules

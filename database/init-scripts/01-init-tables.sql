@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS questions_common_words_notify (
     -- Numarul de raspunsuri care trebuie date
     answers_target INTEGER DEFAULT 3,
     -- Numarul de raspunsuri date
-    answers INTEGER DEFAULT 3,
+    answers INTEGER DEFAULT 0,
     -- Lista de cuvinte, separate prin virgula
     words VARCHAR (256) NOT NULL
 );

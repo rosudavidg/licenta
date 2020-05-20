@@ -57,7 +57,7 @@ const create = async (userId) => {
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
   // Creeaza o noua intrebare
-  createByType(userId, question_type);
+  await createByType(userId, question_type);
 };
 
 const createByType = async (userId, type) => {
@@ -65,13 +65,19 @@ const createByType = async (userId, type) => {
 
   switch (type) {
     case "today":
-      createTodayQuestion(userId);
+      await createTodayQuestion(userId);
       break;
     case "season":
-      createSeasonQuestion(userId);
+      await createSeasonQuestion(userId);
       break;
     case "face":
-      createFaceQuestion(userId);
+      await createFaceQuestion(userId);
+      break;
+    case "common_words_notify":
+      await createCommonWordsNotify(userId);
+      break;
+    case "common_words":
+      await createCommonWords(userId);
       break;
   }
 };
@@ -98,6 +104,47 @@ const createSeasonQuestion = async (userId) => {
     "Ce anotimp este acum?",
     answer_type,
   ]);
+};
+
+const createCommonWordsNotify = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'common_words_notify'"))[0]["id"];
+  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'notify'"))[0]["id"];
+  const common_words = await query("SELECT * FROM common_words");
+  let numberOfElements = 3;
+  const selectedElements = [];
+
+  // Selectarea a numberOfElements elemente diferite random
+  while (numberOfElements != 0) {
+    const element = common_words[Math.floor(Math.random() * common_words.length)]["word"];
+    if (!(element in selectedElements)) {
+      selectedElements.push(element);
+      numberOfElements--;
+    }
+  }
+
+  const elements = selectedElements.join();
+
+  // Adauga intrebarea generica
+  const question = await query(
+    "INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4) RETURNING *",
+    [type, userId, "Reține următoarea listă de cuvinte!", answer_type]
+  );
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_common_words_notify (id, words) VALUES ($1, $2)", [questionId, elements]);
+};
+
+const createCommonWords = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'common_words'"))[0]["id"];
+  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'text'"))[0]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query(
+    "INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4) RETURNING *",
+    [type, userId, "Îți mai aduci aminte ultimele cuvinte? Care erau acelea?", answer_type]
+  );
 };
 
 const createFaceQuestion = async (userId) => {
@@ -136,18 +183,25 @@ const getImage = async (faceId) => {
 const getActiveQuestion = async (userId) => {
   const question = (
     await query(
-      "SELECT message, name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE user_id = $1 AND answered = FALSE",
+      "SELECT q.id, message, name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE user_id = $1 AND answered = FALSE",
       [userId]
     )
   )[0];
 
+  const questionId = question["id"];
+
   switch (question["type"]) {
     case "face":
-      const faceId = (
-        await query("SELECT face_id FROM questions_face f JOIN questions q ON f.id = q.id WHERE q.answered = FALSE")
-      )[0]["face_id"];
+      const faceId = (await query("SELECT face_id FROM questions_face WHERE id = $1", [questionId]))[0]["face_id"];
 
       question["image"] = await getImage(faceId);
+      break;
+    case "common_words_notify":
+      const words = (await query("SELECT words FROM questions_common_words_notify WHERE id = $1", [questionId]))[0][
+        "words"
+      ];
+
+      question["words"] = words.split(",");
       break;
   }
 

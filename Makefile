@@ -1,5 +1,9 @@
 .PHONY: all build run restart stop backend-data
 
+compose:
+	docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+	docker-compose down && docker-compose up --build
+
 # Construieste imaginile si porneste aplicatia
 all: build run
 

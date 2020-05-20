@@ -426,3 +426,18 @@ def insert_posts(connection, data):
         connection.rollback()
 
     cursor.close()
+
+
+def set_ready(connection, user_id):
+    cursor = connection.cursor()
+
+    sql = ("UPDATE users SET ready = true WHERE id = %s")
+    val = (user_id,)
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

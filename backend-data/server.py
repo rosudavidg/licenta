@@ -1,4 +1,4 @@
-from facebook_collector import facebook_collect
+from facebook_collector import facebook_collect, is_a_valid_facebook_profile
 from file_system import save_posts_images, save_albums_photos
 from face_api import get_persons
 from flask import Flask, request, Response, make_response, send_file
@@ -11,6 +11,32 @@ import base64
 app = Flask(__name__)
 
 db_connection = database.create_database_connection()
+
+
+@app.route('/users/validate', methods=['POST'])
+def validate_users():
+    """Verifica existenta unui profil facebook valid"""
+
+    try:
+        # Extrag access-token-ul din cerere
+        token = request.args.get('token')
+
+        if token == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        # Extrag id-ul din cerere
+        id = request.args.get('id')
+
+        if id == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        if is_a_valid_facebook_profile(token, id):
+            return Response("True", status=200, mimetype='application/json')
+        else:
+            return Response("False", status=200, mimetype='application/json')
+
+    except:
+        return Response("False", status=200, mimetype='application/json')
 
 
 @app.route('/users', methods=['POST'])
@@ -90,8 +116,10 @@ def index():
         database.insert_persons(
             db_connection, persons_rest, data['profile']['id'])
 
-        return Response("Successfully created", status=201, mimetype='application/json')
+        # Marcheaza contul drept "ready" - datele au fost procesate
+        database.set_ready(db_connection, data['profile']['id'])
 
+        return Response("Successfully created", status=201, mimetype='application/json')
     except:
         return Response.status_code(500)
 

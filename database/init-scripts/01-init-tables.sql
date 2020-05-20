@@ -266,18 +266,50 @@ CREATE TABLE IF NOT EXISTS question_types (
     name VARCHAR (64) NOT NULL
 );
 
+-- Tipurile de raspunsuri la intrebari
+CREATE TABLE IF NOT EXISTS answer_types (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Numele
+    name VARCHAR (64) NOT NULL
+);
+
 -- Intrebarile generate
 CREATE TABLE IF NOT EXISTS questions (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Tipul intrebarii
     type INTEGER REFERENCES question_types(id),
+    -- Tipul raspunsului
+    answer_type INTEGER REFERENCES answer_types(id),
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
+    -- Mesajul intrebarii
+    message TEXT,
     -- Intrebarea a primit sau nu raspuns
     answered BOOLEAN DEFAULT FALSE,
     -- Data la care a fost adaugata intrarea
-    created_time TIMESTAMP NOT NULL
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Intrebarile de tip - recunoastere persoane
+CREATE TABLE IF NOT EXISTS questions_face (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul fetei
+    face_id INTEGER REFERENCES faces(id)
+);
+
+-- Intrebarile de tip - memorare cuvinte - prezentare cuvinte
+CREATE TABLE IF NOT EXISTS questions_common_words_notify (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Numarul de raspunsuri care trebuie date
+    answers_target INTEGER DEFAULT 3,
+    -- Numarul de raspunsuri date
+    answers INTEGER DEFAULT 3,
+    -- Lista de cuvinte, separate prin virgula
+    words VARCHAR (256) NOT NULL
 );
 
 -- Raspunsurile utilizatorilor la intrebarile despre persoane din imagini
@@ -289,7 +321,7 @@ CREATE TABLE IF NOT EXISTS answers_face (
     -- Raspunsul utilizatorului
     name TEXT,
     -- Data la care a fost adaugat raspunsul
-    created_time TIMESTAMP NOT NULL
+    created_time TIMESTAMP DEFAULT NOW()
 );
 
 -- Raspunsurile utilizatorilor la intrebarile despre ziua saptamanii
@@ -303,7 +335,7 @@ CREATE TABLE IF NOT EXISTS answers_today (
     -- Precizia raspunsului
     accuracy FLOAT,
     -- Data la care a fost adaugat raspunsul
-    created_time TIMESTAMP NOT NULL
+    created_time TIMESTAMP DEFAULT NOW()
 );
 
 -- Raspunsurile utilizatorilor la intrebarile despre anotimp
@@ -317,7 +349,7 @@ CREATE TABLE IF NOT EXISTS answers_season (
     -- Precizia raspunsului
     accuracy FLOAT,
     -- Data la care a fost adaugat raspunsul
-    created_time TIMESTAMP NOT NULL
+    created_time TIMESTAMP DEFAULT NOW()
 );
 
 -- Raspunsurile utilizatorilor la intrebarile cuvinte uzuale
@@ -331,5 +363,5 @@ CREATE TABLE IF NOT EXISTS answers_common_words (
     -- Precizia raspunsului
     accuracy FLOAT,
     -- Data la care a fost adaugat raspunsul
-    created_time TIMESTAMP NOT NULL
+    created_time TIMESTAMP DEFAULT NOW()
 );

@@ -349,3 +349,18 @@ def facebook_collect(token):
         return data
     except:
         raise Exception('Something Bad Happened.')
+
+
+def is_a_valid_facebook_profile(token, id):
+    """
+    Verifica daca perechea token, id este una valida
+    """
+    try:
+        graph = facebook.GraphAPI(token)
+
+        profile = collect_user_profile(graph)
+
+        return profile['id'] == id
+
+    except:
+        return False

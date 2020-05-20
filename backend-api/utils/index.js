@@ -2,7 +2,7 @@ const validator = require("validator");
 
 const { ServerError } = require("../errors");
 
-const http = require("http");
+const axios = require("axios");
 
 const validateFields = (fields) => {
   for (let fieldName in fields) {
@@ -55,24 +55,25 @@ const validateFields = (fields) => {
 };
 
 const createUser = async (token) => {
-  const options = {
-    host: process.env.BACKEND_DATA_HOST,
-    port: process.env.BACKEND_DATA_PORT,
-    path: `/users?token=${token}`,
-    method: "POST",
-  };
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/users?token=${token}`;
 
-  await http
-    .request(options, function (res) {
-      res.setEncoding("utf8");
-      res.on("data", function (chunk) {
-        console.log("BODY: " + chunk);
-      });
-    })
-    .end();
+  axios.post(`http://${host}:${port}${path}`);
+};
+
+const validateUser = async (token, id) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/users/validate?token=${token}&id=${id}`;
+
+  const response = await axios.post(`http://${host}:${port}${path}`);
+
+  return response.data == "True";
 };
 
 module.exports = {
   validateFields,
   createUser,
+  validateUser,
 };

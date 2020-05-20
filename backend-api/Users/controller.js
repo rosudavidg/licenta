@@ -3,7 +3,7 @@ const router = express.Router();
 const UsersService = require("./services.js");
 
 const { ServerError } = require("../errors");
-const { validateFields, createUser } = require("../utils");
+const { validateFields, createUser, validateUser } = require("../utils");
 const { generateToken } = require("../security/JWT/index.js");
 
 router.post("/login", async (req, res, next) => {
@@ -23,9 +23,15 @@ router.post("/login", async (req, res, next) => {
       },
     });
 
-    // TODO: Testeaza perechea userId, token
-
     if (!(await UsersService.userExists(userId))) {
+      // Daca user-ul nu exista, este inregistrat
+
+      // Se verifica daca este un cont de Facebook valid
+      if (!(await validateUser(token, userId))) {
+        res.sendStatus(401);
+        return;
+      }
+
       // Se creeaza un nou user in baza de date
       await UsersService.create(userId);
 

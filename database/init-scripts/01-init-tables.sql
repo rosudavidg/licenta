@@ -257,3 +257,79 @@ CREATE TABLE IF NOT EXISTS posts (
     -- Data la care a fost adaugata intrarea
     created_time TIMESTAMP NOT NULL
 );
+
+-- Tipurile de intrebari care pot fi generate
+CREATE TABLE IF NOT EXISTS question_types (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Numele
+    name VARCHAR (64) NOT NULL
+);
+
+-- Intrebarile generate
+CREATE TABLE IF NOT EXISTS questions (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Tipul intrebarii
+    type INTEGER REFERENCES question_types(id),
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
+    -- Intrebarea a primit sau nu raspuns
+    answered BOOLEAN DEFAULT FALSE,
+    -- Data la care a fost adaugata intrarea
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre persoane din imagini
+CREATE TABLE IF NOT EXISTS answers_face (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre ziua saptamanii
+CREATE TABLE IF NOT EXISTS answers_today (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    day TEXT,
+    -- Precizia raspunsului
+    accuracy FLOAT,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre anotimp
+CREATE TABLE IF NOT EXISTS answers_season (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    season TEXT,
+    -- Precizia raspunsului
+    accuracy FLOAT,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP NOT NULL
+);
+
+-- Raspunsurile utilizatorilor la intrebarile cuvinte uzuale
+CREATE TABLE IF NOT EXISTS answers_common_words (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    text TEXT,
+    -- Precizia raspunsului
+    accuracy FLOAT,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP NOT NULL
+);

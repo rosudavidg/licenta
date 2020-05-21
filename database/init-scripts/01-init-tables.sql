@@ -258,14 +258,6 @@ CREATE TABLE IF NOT EXISTS posts (
     created_time TIMESTAMP NOT NULL
 );
 
--- Tipurile de intrebari care pot fi generate
-CREATE TABLE IF NOT EXISTS question_types (
-    -- Id
-    id SERIAL PRIMARY KEY,
-    -- Numele
-    name VARCHAR (64) NOT NULL
-);
-
 -- Tipurile de raspunsuri la intrebari
 CREATE TABLE IF NOT EXISTS answer_types (
     -- Id
@@ -274,14 +266,22 @@ CREATE TABLE IF NOT EXISTS answer_types (
     name VARCHAR (64) NOT NULL
 );
 
+-- Tipurile de intrebari care pot fi generate
+CREATE TABLE IF NOT EXISTS question_types (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Numele
+    name VARCHAR (64) NOT NULL,
+    -- Tipul raspunsului
+    answer_type INTEGER REFERENCES answer_types(id)
+);
+
 -- Intrebarile generate
 CREATE TABLE IF NOT EXISTS questions (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Tipul intrebarii
     type INTEGER REFERENCES question_types(id),
-    -- Tipul raspunsului
-    answer_type INTEGER REFERENCES answer_types(id),
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
     -- Mesajul intrebarii
@@ -303,13 +303,21 @@ CREATE TABLE IF NOT EXISTS questions_face (
 -- Intrebarile de tip - memorare cuvinte - prezentare cuvinte
 CREATE TABLE IF NOT EXISTS questions_common_words_notify (
     -- Intrebarea
-    id INTEGER REFERENCES questions(id),
+    id INTEGER UNIQUE REFERENCES questions(id),
     -- Numarul de raspunsuri care trebuie date
     answers_target INTEGER DEFAULT 3,
     -- Numarul de raspunsuri date
     answers INTEGER DEFAULT 0,
     -- Lista de cuvinte, separate prin virgula
     words VARCHAR (256) NOT NULL
+);
+
+-- Intrebarile de tip - memorare cuvinte - intrebare cuvinte
+CREATE TABLE IF NOT EXISTS questions_common_words (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul intrebarii de prezentare a cuvintelor
+    notify_id INTEGER REFERENCES questions_common_words_notify(id)
 );
 
 -- Raspunsurile utilizatorilor la intrebarile despre persoane din imagini

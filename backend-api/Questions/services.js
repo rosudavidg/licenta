@@ -84,31 +84,26 @@ const createByType = async (userId, type) => {
 
 const createTodayQuestion = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'today'"))[0]["id"];
-  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'text'"))[0]["id"];
 
-  await query("INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4)", [
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
     type,
     userId,
     "Ce zi a săptămânii este astăzi?",
-    answer_type,
   ]);
 };
 
 const createSeasonQuestion = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'season'"))[0]["id"];
-  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'text'"))[0]["id"];
 
-  await query("INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4)", [
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
     type,
     userId,
     "Ce anotimp este acum?",
-    answer_type,
   ]);
 };
 
 const createCommonWordsNotify = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'common_words_notify'"))[0]["id"];
-  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'notify'"))[0]["id"];
   const common_words = await query("SELECT * FROM common_words");
   let numberOfElements = 3;
   const selectedElements = [];
@@ -125,10 +120,11 @@ const createCommonWordsNotify = async (userId) => {
   const elements = selectedElements.join();
 
   // Adauga intrebarea generica
-  const question = await query(
-    "INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4) RETURNING *",
-    [type, userId, "Reține următoarea listă de cuvinte!", answer_type]
-  );
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Reține următoarea listă de cuvinte!",
+  ]);
 
   const questionId = question[0]["id"];
 
@@ -138,18 +134,27 @@ const createCommonWordsNotify = async (userId) => {
 
 const createCommonWords = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'common_words'"))[0]["id"];
-  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'text'"))[0]["id"];
 
   // Adauga intrebarea generica
-  const question = await query(
-    "INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4) RETURNING *",
-    [type, userId, "Îți mai aduci aminte ultimele cuvinte? Care erau acelea?", answer_type]
-  );
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Îți mai aduci aminte ultimele cuvinte? Care erau acelea?",
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Extrag id-ul notify-ului de prezentare a cuvintelor
+  const notifyId = (await query("SELECT * FROM questions_common_words_notify WHERE answers_target != answers"))[0][
+    "id"
+  ];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_common_words (id, notify_id) VALUES ($1, $2)", [questionId, notifyId]);
 };
 
 const createFaceQuestion = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'face'"))[0]["id"];
-  const answer_type = (await query("SELECT * FROM answer_types WHERE name = 'text'"))[0]["id"];
 
   // Extrage toate fetele posibile
   const faces = await query("SELECT f.id FROM faces f JOIN images i ON f.image_id = i.id WHERE user_id = $1", [userId]);
@@ -158,10 +163,11 @@ const createFaceQuestion = async (userId) => {
   const faceId = faces[Math.floor(Math.random() * faces.length)]["id"];
 
   // Adauga intrebarea generica
-  const question = await query(
-    "INSERT INTO questions (type, user_id, message, answer_type) VALUES ($1, $2, $3, $4) RETURNING *",
-    [type, userId, "Care este prenumele persoanei evidențiate în imagine?", answer_type]
-  );
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Care este prenumele persoanei evidențiate în imagine?",
+  ]);
 
   const questionId = question[0]["id"];
 

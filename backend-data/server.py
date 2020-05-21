@@ -206,6 +206,7 @@ def common_words_accuracy():
             for guessed_word in guessed_words:
                 if same_word(target_word, guessed_word):
                     count += 1
+                    guessed_words.remove(guessed_word)
                     break
 
         return Response(str(count / len(target_words)), status=200, mimetype='application/json')

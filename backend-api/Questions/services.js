@@ -190,6 +190,17 @@ const getImage = async (faceId) => {
   return response.data;
 };
 
+const getAccuracy = async (target, guessed) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/words_accuracy?target=${target}&guessed=${guessed}`;
+
+  // Cerere catre backend-data pentru a calcula acuratetea
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getActiveQuestion = async (userId) => {
   const question = (
     await query(
@@ -345,6 +356,45 @@ const answerFace = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerCommonWords = async (questionId, answer) => {
+  // Parseaza lista de cuvinte
+  const words = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0);
+
+  // Extrage lista de cuvinte initiala
+  const realWords = (
+    await query(
+      "SELECT n.words as words FROM questions q JOIN questions_common_words w ON q.id = w.id JOIN questions_common_words_notify n ON n.id = w.notify_id WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["words"];
+
+  // Calculez precizia raspunsului
+  const accuracy = await getAccuracy(realWords, words);
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_common_words (question_id, text, accuracy) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    accuracy,
+  ]);
+
+  // Extrage numarul notificarii
+  const notifyId = (
+    await query(
+      "SELECT n.id as notify_id FROM questions q JOIN questions_common_words w ON q.id = w.id JOIN questions_common_words_notify n ON n.id = w.notify_id WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["notify_id"];
+
+  console.log(notifyId);
+
+  // Incrementez numarul de raspunsuri
+  await query("UPDATE questions_common_words_notify SET answers = answers + 1 WHERE id = $1", [notifyId]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answer = async (questionId, answer) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -357,6 +407,7 @@ const answer = async (questionId, answer) => {
       await answerFace(questionId, answer);
       break;
     case "common_words":
+      await answerCommonWords(questionId, answer);
       break;
   }
 };

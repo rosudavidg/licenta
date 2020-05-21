@@ -185,5 +185,33 @@ def words():
         return Response("False", status=200, mimetype='application/json')
 
 
+@app.route('/words_accuracy', methods=['GET'])
+def common_words_accuracy():
+    """Calculeaza precizia dintre doua liste de cuvinte (raspunsuri la common words)"""
+
+    try:
+        # Extrag cuvintele din cerere
+        target = request.args.get('target')
+        guessed = request.args.get('guessed')
+
+        if target == None or guessed == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        target_words = target.split(",")
+        guessed_words = guessed.split(",")
+
+        count = 0
+
+        for target_word in target_words:
+            for guessed_word in guessed_words:
+                if same_word(target_word, guessed_word):
+                    count += 1
+                    break
+
+        return Response(str(count / len(target_words)), status=200, mimetype='application/json')
+    except:
+        return Response("False", status=200, mimetype='application/json')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

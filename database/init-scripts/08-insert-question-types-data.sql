@@ -22,10 +22,10 @@ INSERT INTO question_types (name, answer_type)
 INSERT INTO question_types (name, answer_type)
     SELECT 'season', answer_types.id
     FROM answer_types
-    WHERE answer_types.name = 'text';
+    WHERE answer_types.name = 'choice';
 
 -- Intrebare pentru recunoasterea zilei din saptamana
 INSERT INTO question_types (name, answer_type)
     SELECT 'today', answer_types.id
     FROM answer_types
-    WHERE answer_types.name = 'text';
+    WHERE answer_types.name = 'choice';

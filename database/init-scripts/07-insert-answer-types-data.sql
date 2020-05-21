@@ -5,3 +5,6 @@ INSERT INTO answer_types (name) VALUES ('text');
 
 -- Raspuns de tip confirm, care nu contine date (ex: apasarea unui buton OK)
 INSERT INTO answer_types (name) VALUES ('confirm');
+
+-- Raspuns de tip alegere
+INSERT INTO answer_types (name) VALUES ('choice');

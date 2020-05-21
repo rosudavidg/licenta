@@ -266,6 +266,14 @@ CREATE TABLE IF NOT EXISTS days_of_the_week (
     name VARCHAR (32) NOT NULL
 );
 
+-- Tabela pentru anotimpuri
+CREATE TABLE IF NOT EXISTS seasons (
+    -- Id (dar si indexul lui, incepand cu primavara)
+    id INTEGER PRIMARY KEY,
+    -- Numele
+    name VARCHAR (32) NOT NULL
+);
+
 -- Tipurile de raspunsuri la intrebari
 CREATE TABLE IF NOT EXISTS answer_types (
     -- Id

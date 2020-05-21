@@ -209,8 +209,30 @@ const getActiveQuestion = async (userId) => {
 
       question["words"] = words.split(",");
       break;
+    case "today":
+      const days_of_the_week = await query("SELECT name FROM days_of_the_week");
+
+      question["choices"] = [];
+
+      for (let i = 0; i < days_of_the_week.length; i++) {
+        question["choices"].push(days_of_the_week[i]["name"]);
+      }
+
+      break;
+    case "season":
+      const seasons = await query("SELECT name FROM seasons");
+
+      question["choices"] = [];
+
+      for (let i = 0; i < seasons.length; i++) {
+        question["choices"].push(seasons[i]["name"]);
+      }
   }
 
+  // Eliminarea campurile care nu sunt necesare
+  delete question.type;
+
+  // Intoarce raspunsul catre client
   return question;
 };
 

@@ -2,7 +2,7 @@ from facebook_collector import facebook_collect, is_a_valid_facebook_profile
 from file_system import save_posts_images, save_albums_photos
 from face_api import get_persons
 from flask import Flask, request, Response, make_response, send_file
-from utils import get_all_image_paths, get_all_images
+from utils import get_all_image_paths, get_all_images, same_word
 from threading import Lock
 import database
 import cv2
@@ -15,6 +15,7 @@ db_connection = database.create_database_connection()
 
 # Lock global pentru accesul la o sectiune critica
 lock = Lock()
+
 
 @app.route('/users/validate', methods=['POST'])
 def validate_users():
@@ -161,6 +162,27 @@ def get_face(id):
 
     # Trimite imaginea
     return response
+
+
+@app.route('/words', methods=['GET'])
+def words():
+    """Verifica daca doua cuvinte sunt la fel (dar scrise gresit)"""
+
+    try:
+        # Extrag cuvintele din cerere
+        word1 = request.args.get('word1')
+        word2 = request.args.get('word2')
+
+        if word1 == None or word2 == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        if same_word(word1, word2):
+            return Response("True", status=200, mimetype='application/json')
+        else:
+            return Response("False", status=200, mimetype='application/json')
+
+    except:
+        return Response("False", status=200, mimetype='application/json')
 
 
 if __name__ == "__main__":

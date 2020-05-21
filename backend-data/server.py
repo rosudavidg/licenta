@@ -3,15 +3,18 @@ from file_system import save_posts_images, save_albums_photos
 from face_api import get_persons
 from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images
-import pickle
+from threading import Lock
 import database
 import cv2
 import base64
 
 app = Flask(__name__)
 
+# Conexiunea la baza de date
 db_connection = database.create_database_connection()
 
+# Lock global pentru accesul la o sectiune critica
+lock = Lock()
 
 @app.route('/users/validate', methods=['POST'])
 def validate_users():
@@ -44,6 +47,8 @@ def index():
     """Adaugarea unui nou utilizator in sistem"""
 
     try:
+        lock.acquire()
+
         # Extrag access-token-ul din cerere
         token = request.args.get('token')
 
@@ -122,6 +127,8 @@ def index():
         return Response("Successfully created", status=201, mimetype='application/json')
     except:
         return Response.status_code(500)
+    finally:
+        lock.release()
 
     return Response.status_code(201)
 

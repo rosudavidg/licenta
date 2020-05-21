@@ -2,6 +2,10 @@ const query = require("../database");
 
 const axios = require("axios");
 
+const { ServerError } = require("../errors");
+
+const { getSeasonId } = require("../utils");
+
 const activeQuestionExists = async (userId) => {
   // Intoarce true daca exista cel putin o intrebare activa care nu a primit feedback de la utilizator
   return (
@@ -236,8 +240,134 @@ const getActiveQuestion = async (userId) => {
   return question;
 };
 
+const canAnswer = async (userId, questionId) => {
+  const questions = await query("SELECT * FROM questions WHERE id = $1 AND user_id = $2 AND answered = FALSE", [
+    questionId,
+    userId,
+  ]);
+
+  return questions.length == 1;
+};
+
+const getAnswerType = async (questionId) => {
+  const answerType = await query(
+    "SELECT a.name as type FROM questions q JOIN question_types t ON q.type = t.id JOIN answer_types a ON t.answer_type = a.id WHERE q.id = $1",
+    [questionId]
+  );
+
+  return answerType[0]["type"];
+};
+
+const confirm = async (questionId) => {
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerToday = async (questionId, choice) => {
+  const realDayNo = new Date().getDay();
+  const guessDayNo = (await query("SELECT id FROM days_of_the_week WHERE name = $1", [choice]))[0]["id"];
+
+  let correct = true;
+
+  // Verifica corectitudinea raspunsului
+  if (realDayNo != guessDayNo) {
+    correct = false;
+  }
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_today (question_id, day, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerSeason = async (questionId, choice) => {
+  const guessSeasonId = (await query("SELECT id FROM seasons WHERE name = $1", [choice]))[0]["id"];
+  const realSeasonId = getSeasonId(new Date().getMonth());
+
+  let correct = true;
+
+  // Verifica corectitudinea raspunsului
+  if (guessSeasonId != realSeasonId) {
+    correct = false;
+  }
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_season (question_id, season, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const choose = async (questionId, choice) => {
+  const questionType = (
+    await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["type"];
+
+  switch (questionType) {
+    case "today":
+      const matchesNoToday = (await query("SELECT * FROM days_of_the_week WHERE name = $1", [choice])).length;
+
+      if (matchesNoToday != 1) {
+        throw new ServerError("Invalid day of the week!", 400);
+      }
+
+      await answerToday(questionId, choice);
+
+      break;
+    case "season":
+      const matchesNoSeason = (await query("SELECT * FROM seasons WHERE name = $1", [choice])).length;
+
+      if (matchesNoSeason != 1) {
+        throw new ServerError("Invalid season!", 400);
+      }
+
+      await answerSeason(questionId, choice);
+
+      break;
+  }
+};
+
+const answerFace = async (questionId, answer) => {
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_face (question_id, name) VALUES ($1, $2)", [questionId, answer]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answer = async (questionId, answer) => {
+  const questionType = (
+    await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["type"];
+
+  switch (questionType) {
+    case "face":
+      await answerFace(questionId, answer);
+      break;
+    case "common_words":
+      break;
+  }
+};
+
 module.exports = {
   activeQuestionExists,
   create,
   getActiveQuestion,
+  canAnswer,
+  getAnswerType,
+  confirm,
+  choose,
+  answer,
 };

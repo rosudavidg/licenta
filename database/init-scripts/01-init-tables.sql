@@ -356,8 +356,8 @@ CREATE TABLE IF NOT EXISTS answers_today (
     question_id INTEGER REFERENCES questions(id),
     -- Raspunsul utilizatorului
     day TEXT,
-    -- Precizia raspunsului
-    accuracy FLOAT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
@@ -370,8 +370,8 @@ CREATE TABLE IF NOT EXISTS answers_season (
     question_id INTEGER REFERENCES questions(id),
     -- Raspunsul utilizatorului
     season TEXT,
-    -- Precizia raspunsului
-    accuracy FLOAT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );

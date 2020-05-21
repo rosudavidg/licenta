@@ -72,8 +72,28 @@ const validateUser = async (token, id) => {
   return response.data == "True";
 };
 
+const getSeasonId = (monthId) => {
+  switch (monthId) {
+    case 2:
+    case 3:
+    case 4:
+      return 1;
+    case 5:
+    case 6:
+    case 7:
+      return 2;
+    case 8:
+    case 9:
+    case 10:
+      return 3;
+    default:
+      return 4;
+  }
+};
+
 module.exports = {
   validateFields,
   createUser,
   validateUser,
+  getSeasonId,
 };

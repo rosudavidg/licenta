@@ -5,4 +5,4 @@ INSERT INTO days_of_the_week (id, name) VALUES (3, 'Miercuri');
 INSERT INTO days_of_the_week (id, name) VALUES (4, 'Joi');
 INSERT INTO days_of_the_week (id, name) VALUES (5, 'Vineri');
 INSERT INTO days_of_the_week (id, name) VALUES (6, 'Sâmbătă');
-INSERT INTO days_of_the_week (id, name) VALUES (7, 'Duminică');
+INSERT INTO days_of_the_week (id, name) VALUES (0, 'Duminică');

@@ -4,7 +4,6 @@ const QuestionsService = require("./services.js");
 const { authorizeAndExtractToken } = require("../security/JWT/index.js");
 const { accountIsReady } = require("../middlewares/index.js");
 
-// TODO: campul ready trebuie sa fie setat; adauga middleware
 router.get("/", authorizeAndExtractToken, accountIsReady, async (req, res, next) => {
   const { userId } = req.state.decoded;
 

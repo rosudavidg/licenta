@@ -258,6 +258,14 @@ CREATE TABLE IF NOT EXISTS posts (
     created_time TIMESTAMP NOT NULL
 );
 
+-- Tabela pentru zilele din saptamana
+CREATE TABLE IF NOT EXISTS days_of_the_week (
+    -- Id (dar si a cata zi este)
+    id INTEGER PRIMARY KEY,
+    -- Numele
+    name VARCHAR (32) NOT NULL
+);
+
 -- Tipurile de raspunsuri la intrebari
 CREATE TABLE IF NOT EXISTS answer_types (
     -- Id

@@ -101,11 +101,11 @@ def get_persons(filenames):
     # model = VGGFace(model='resnet50', include_top=False,
     #                 input_shape=(224, 224, 3), pooling='avg')
 
-    json_file = open('/user/src/app/face_model.json', 'r')
+    json_file = open('/usr/src/app/face_model.json', 'r')
     model_json = json_file.read()
     json_file.close()
     model = model_from_json(model_json)
-    model.load_weights("/user/src/app/face_model.h5")
+    model.load_weights("/usr/src/app/face_model.h5")
 
     faces = []
 

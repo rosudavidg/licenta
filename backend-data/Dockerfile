@@ -23,11 +23,15 @@ COPY requirements.txt /usr/src/app/
 # Instalare dependinte
 RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt
 
+# Instalare stopwords si punkt din nltk
+RUN python3 -m nltk.downloader stopwords
+RUN python3 -m nltk.downloader punkt
+
 # Copiere aplicatie
 COPY *.py /usr/src/app/
 
 # Copiere modele
-COPY *_model.* /user/src/app/
+COPY *_model.* /usr/src/app/
 
 # Adaugare cale pentru salvare imagini
 RUN mkdir /images

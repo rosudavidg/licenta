@@ -60,10 +60,10 @@ def index():
             return Response("Facebook data collecting failed!", status=500, mimetype='application/json')
 
         # Salveaza imaginile asociate postarilor (pe disk)
-        # save_posts_images(data)
+        save_posts_images(data)
 
         # Salveaza pozele din albume (pe disk)
-        # save_albums_photos(data)
+        save_albums_photos(data)
 
         # Salvez profilul utilizatorului
         database.insert_profile(db_connection, data['profile'])

@@ -1,6 +1,6 @@
 import facebook
 # TODO: remove next line
-from test_data import data as my_test_data
+# from test_data import data as my_test_data
 
 # Limita de rezultate pentru o cerere
 LIMIT = 255
@@ -318,7 +318,7 @@ def facebook_collect(token):
     In caz de eroare, se arunca o exceptie generica.
     """
     # TODO: remove next line
-    return my_test_data
+    # return my_test_data
     try:
         graph = facebook.GraphAPI(token)
 

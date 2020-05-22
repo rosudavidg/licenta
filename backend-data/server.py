@@ -1,7 +1,6 @@
 from facebook_collector import facebook_collect, is_a_valid_facebook_profile
 from file_system import save_posts_images, save_albums_photos
 from face_api import get_persons
-from post_api import predict
 from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images, same_word
 from threading import Lock

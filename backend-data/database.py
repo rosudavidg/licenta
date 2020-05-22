@@ -4,6 +4,11 @@ import re
 from get_docker_secret import get_docker_secret
 import os
 from face_api import is_match
+from post_api import predict
+from googletrans import Translator
+
+# Google Translate API pentru a traduce textele in engleza
+translator = Translator()
 
 
 def create_database_connection():
@@ -410,13 +415,29 @@ def insert_known_persons(connection, persons, user_id):
         return persons
 
 
+def get_subject_id(subjects, subject_name):
+    for id, name in subjects:
+        if name == subject_name:
+            return id
+
+
 def insert_posts(connection, data):
     user_id = data['profile']['id']
 
     cursor = connection.cursor()
 
+    sql_subject_id = ("SELECT id, name FROM post_types")
+    subjects = []
+
+    try:
+        cursor.execute(sql_subject_id)
+        connection.commit()
+        subjects = cursor.fetchall()
+    except:
+        connection.rollback()
+
     sql = ("INSERT INTO posts (user_id, post_type, message, created_time) VALUES (%s, %s, %s, %s)")
-    vals = [(user_id, 1, post['message'], post['created_time'])
+    vals = [(user_id, get_subject_id(subjects, predict(translator.translate(post['message'], dest='en').text)), post['message'], post['created_time'])
             for post in data['posts'] if 'message' in post]
 
     try:

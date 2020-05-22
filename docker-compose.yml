@@ -64,6 +64,8 @@ services:
       - secret_database_user
       - secret_database_password
       - secret_database_db
+    volumes:
+      - volume_database:/var/lib/postgresql/data
     ports:
       - "54321:5432"
     networks:
@@ -72,6 +74,7 @@ networks:
   webnetwork:
 volumes:
   volume_backend_data:
+  volume_database:
 secrets:
   secret_database_password:
     file: ./secrets/secret_database_password

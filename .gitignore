@@ -13,3 +13,7 @@ secrets
 test_data.py
 
 node_modules
+
+# TODO: remove next two lines
+# Documente in curs de dezvoltare paralela
+clock

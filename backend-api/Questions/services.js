@@ -127,7 +127,7 @@ const createCommonWordsNotify = async (userId) => {
   const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
     type,
     userId,
-    "Reține următoarea listă de cuvinte!",
+    "Reține următoarea listă de cuvinte: ",
   ]);
 
   const questionId = question[0]["id"];
@@ -214,6 +214,7 @@ const getActiveQuestion = async (userId) => {
   switch (question["type"]) {
     case "face":
       const faceId = (await query("SELECT face_id FROM questions_face WHERE id = $1", [questionId]))[0]["face_id"];
+      question["type"] = "text";
 
       question["image"] = await getImage(faceId);
       break;
@@ -221,11 +222,15 @@ const getActiveQuestion = async (userId) => {
       const words = (await query("SELECT words FROM questions_common_words_notify WHERE id = $1", [questionId]))[0][
         "words"
       ];
+      question["type"] = "confirm";
 
-      question["words"] = words.split(",");
+      const wordsList = words.split(",").join(", ");
+
+      question["message"] += wordsList + "!";
       break;
     case "today":
       const days_of_the_week = await query("SELECT name FROM days_of_the_week");
+      question["type"] = "choice";
 
       question["choices"] = [];
 
@@ -236,16 +241,21 @@ const getActiveQuestion = async (userId) => {
       break;
     case "season":
       const seasons = await query("SELECT name FROM seasons");
+      question["type"] = "choice";
 
       question["choices"] = [];
 
       for (let i = 0; i < seasons.length; i++) {
         question["choices"].push(seasons[i]["name"]);
       }
+      break;
+    case "common_words":
+      question["type"] = "text";
+      break;
   }
 
   // Eliminarea campurile care nu sunt necesare
-  delete question.type;
+  // delete question.type;
 
   // Intoarce raspunsul catre client
   return question;

@@ -1,0 +1,15 @@
+html,
+body,
+#root,
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content-footer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  flex: 1;
+}

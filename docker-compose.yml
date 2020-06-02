@@ -1,5 +1,20 @@
 version: "3.1"
 services:
+  frontend:
+    depends_on:
+      - database
+      - backend-api
+      - backend-data
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - webnetwork
+    stdin_open: true
+    volumes:
+      - "./frontend/.:/app"
   backend-api:
     depends_on:
       - database

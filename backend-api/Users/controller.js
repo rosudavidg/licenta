@@ -42,8 +42,13 @@ router.post("/login", async (req, res, next) => {
       status = 201;
     }
 
+    // TODO: Verifica (userId, token) prin req catre backend-data
+
+    // Se aduce imaginea de profil a utilizatorului
+    const profilepic = await UsersService.getProfilepic(userId);
+
     // Se genereaza un token JWT care ii este trimis clientului pentru autentificare
-    const payload = { userId };
+    const payload = { userId, profilepic };
     const JWTtoken = await generateToken(payload);
 
     // Trimite raspunsul la client, impreuna cu token-ul pentru autentificare

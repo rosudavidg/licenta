@@ -1,5 +1,5 @@
 from facebook_collector import facebook_collect, is_a_valid_facebook_profile
-from file_system import save_posts_images, save_albums_photos
+from file_system import save_posts_images, save_albums_photos, save_profile_picture
 from face_api import get_persons
 from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images, same_word
@@ -64,6 +64,9 @@ def index():
 
         # Salveaza pozele din albume (pe disk)
         save_albums_photos(data)
+
+        # Salveaza imaginea de profil (dimensiunea mica)
+        save_profile_picture(data)
 
         # Salvez profilul utilizatorului
         database.insert_profile(db_connection, data['profile'])
@@ -158,6 +161,23 @@ def get_face(id):
 
     # Encodeaza imaginea pentru a o putea trimite
     retval, buffer = cv2.imencode('.png', image)
+    response = base64.b64encode(buffer)
+
+    # Trimite imaginea
+    return response
+
+
+@app.route('/profilepic/<id>', methods=['GET'])
+def get_profilepic(id):
+    """
+    Intoarce profilepic al utilizatorului cu id-ul id
+    """
+
+    # Aduce imaginea in memorie
+    image = cv2.imread(f'/images/{id}/profilepic.jpg')
+
+    # Encodeaza imaginea pentru a o putea trimite
+    retval, buffer = cv2.imencode('.jpg', image)
     response = base64.b64encode(buffer)
 
     # Trimite imaginea

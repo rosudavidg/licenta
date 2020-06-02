@@ -27,7 +27,7 @@ def collect_user_profile(graph):
     # Cerere Facebook API
     res = graph.get_object(
         'me',
-        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,favorite_teams,sports,hometown,languages',
+        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,favorite_teams,sports,hometown,languages,picture',
         locale='en_GB'
     )
 

@@ -110,3 +110,21 @@ def save_albums_photos(data):
 
             # Descarca si salveaza imaginea local
             download_image(image_url, image_path, 'image.jpg')
+
+
+def save_profile_picture(data):
+    """
+    Functie utilizata pentru a salva imaginea de profil a utilizatorului
+    """
+
+    # Extrage id-ul utilizatorului
+    user_id = data['profile']['id']
+
+    # Extrage url-ul utilizatorului
+    image_url = data['profile']['picture']['data']['url']
+
+    # Aleg calea
+    path = '/images/' + user_id
+
+    # Descarca si salveaza imaginea local
+    download_image(image_url, path, 'profilepic.jpg')

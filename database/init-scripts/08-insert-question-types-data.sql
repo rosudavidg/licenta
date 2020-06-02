@@ -29,3 +29,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'today', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare despre detinerea de permis auto
+INSERT INTO question_types (name, answer_type)
+    SELECT 'driving_licence', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare despre semne de circulatie
+INSERT INTO question_types (name, answer_type)
+    SELECT 'traffic_sign', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

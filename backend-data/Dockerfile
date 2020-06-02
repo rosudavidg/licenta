@@ -36,6 +36,10 @@ COPY *_model.* /usr/src/app/
 # Adaugare cale pentru salvare imagini
 RUN mkdir /images
 
+# Adaugare semne de circulatie
+RUN mkdir /traffic-signs
+COPY traffic-signs/ /traffic-signs/
+
 # Expunerea portului pe care ruleaza serviciul
 EXPOSE 5000
 

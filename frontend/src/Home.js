@@ -138,11 +138,11 @@ const Home = () => {
       <div className="home-container">
         <div className="home-message">
           <img className="home-message-icon" src="laptop.jpg" />
-          {question.image && <img className="home-message-image" src={`data:image/jpeg;base64,${question.image}`} />}
+          {question.image && <img className="home-message-image" src={`data:image/png;base64,${question.image}`} />}
           <div className="home-message-text">{question.message}</div>
         </div>
         <div className="home-answer">
-          <img className="home-answer-icon" src={`data:image/jpg;base64,${getProfilepic()}`} />
+          <img className="home-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
           {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
           {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
           {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}

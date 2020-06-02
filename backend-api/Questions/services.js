@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const { ServerError } = require("../errors");
 
-const { getSeasonId } = require("../utils");
+const { getSeasonId, shuffle } = require("../utils");
 
 const activeQuestionExists = async (userId) => {
   // Intoarce true daca exista cel putin o intrebare activa care nu a primit feedback de la utilizator
@@ -57,6 +57,13 @@ const create = async (userId) => {
   // Adauga intrebare de tip today
   question_types.push("today");
 
+  // TODO: exclude intrebarea daca s-a raspuns deja
+  // Adauga intrebare de tip driving licence
+  question_types.push("driving_licence");
+
+  // TODO: verifica daca are driving licence
+  question_types.push("traffic_sign");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -82,6 +89,12 @@ const createByType = async (userId, type) => {
       break;
     case "common_words":
       await createCommonWords(userId);
+      break;
+    case "driving_licence":
+      await createDrivingLicence(userId);
+      break;
+    case "traffic_sign":
+      await createTrafficSign(userId);
       break;
   }
 };
@@ -115,7 +128,7 @@ const createCommonWordsNotify = async (userId) => {
   // Selectarea a numberOfElements elemente diferite random
   while (numberOfElements != 0) {
     const element = common_words[Math.floor(Math.random() * common_words.length)]["word"];
-    if (!(element in selectedElements)) {
+    if (!selectedElements.includes(element)) {
       selectedElements.push(element);
       numberOfElements--;
     }
@@ -134,6 +147,16 @@ const createCommonWordsNotify = async (userId) => {
 
   // Adauga detaliile pentru intrebare
   await query("INSERT INTO questions_common_words_notify (id, words) VALUES ($1, $2)", [questionId, elements]);
+};
+
+const createDrivingLicence = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'driving_licence'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Ai permis de conducere?",
+  ]);
 };
 
 const createCommonWords = async (userId) => {
@@ -179,10 +202,66 @@ const createFaceQuestion = async (userId) => {
   await query("INSERT INTO questions_face (id, face_id) VALUES ($1, $2)", [questionId, faceId]);
 };
 
+const createTrafficSign = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'traffic_sign'"))[0]["id"];
+
+  // Extrage toate indicatoarele
+  const trafficSigns = await query("SELECT * FROM traffic_signs");
+
+  // Alege un indicator random
+  const trafficSignId = trafficSigns[Math.floor(Math.random() * trafficSigns.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Ce reprezintă indicatorul din imagine?",
+  ]);
+
+  // Extrage restul indicatoarelor
+  const trafficSignsRest = await query("SELECT id FROM traffic_signs WHERE id != $1", [trafficSignId]);
+  let numberOfElements = 3;
+  const selectedElements = [];
+
+  // Selectarea a numberOfElements elemente diferite random
+  while (numberOfElements != 0) {
+    const element = trafficSignsRest[Math.floor(Math.random() * trafficSignsRest.length)]["id"];
+
+    if (!selectedElements.includes(element)) {
+      selectedElements.push(element);
+      numberOfElements--;
+    }
+  }
+
+  const questionId = question[0]["id"];
+
+  // Adauga raspunsurile posibile
+  for (let i = 0; i < selectedElements.length; i++) {
+    await query("INSERT INTO questions_traffic_sign_choices (id, traffic_signs) VALUES ($1, $2)", [
+      questionId,
+      selectedElements[i],
+    ]);
+  }
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_traffic_sign (id, traffic_signs) VALUES ($1, $2)", [questionId, trafficSignId]);
+};
+
 const getImage = async (faceId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
   const path = `/face/${faceId}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
+const getTrafficSign = async (trafficSignId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/traffic-sign/${trafficSignId}`;
 
   // Cerere catre backend-data pentru a afisa imaginea cu bounding box
   const response = await axios.get(`http://${host}:${port}${path}`);
@@ -227,6 +306,7 @@ const getActiveQuestion = async (userId) => {
       const wordsList = words.split(",").join(", ");
 
       question["message"] += wordsList + "!";
+      question["image_type"] = "jpg";
       break;
     case "today":
       const days_of_the_week = await query("SELECT name FROM days_of_the_week");
@@ -237,6 +317,36 @@ const getActiveQuestion = async (userId) => {
       for (let i = 0; i < days_of_the_week.length; i++) {
         question["choices"].push(days_of_the_week[i]["name"]);
       }
+
+      break;
+    case "traffic_sign":
+      question["type"] = "choice";
+      question["choices"] = [];
+
+      const choices = await query(
+        "SELECT t.name FROM traffic_signs t JOIN questions_traffic_sign_choices c ON t.id = c.traffic_signs WHERE c.id = $1",
+        [questionId]
+      );
+
+      for (let i = 0; i < choices.length; i++) {
+        question["choices"].push(choices[i].name);
+      }
+
+      const correctAnswer = await query(
+        "SELECT t.name FROM traffic_signs t JOIN questions_traffic_sign q ON q.traffic_signs = t.id WHERE q.id = $1",
+        [questionId]
+      );
+
+      question["choices"].push(correctAnswer[0]["name"]);
+      shuffle(question["choices"]);
+
+      trafficSignId = (await query("SELECT traffic_signs from questions_traffic_sign WHERE id = $1", [questionId]))[0][
+        "traffic_signs"
+      ];
+
+      question["image"] = await getTrafficSign(trafficSignId);
+
+      question["image_type"] = "png";
 
       break;
     case "season":
@@ -251,6 +361,10 @@ const getActiveQuestion = async (userId) => {
       break;
     case "common_words":
       question["type"] = "text";
+      break;
+    case "driving_licence":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
       break;
   }
 
@@ -305,6 +419,32 @@ const answerToday = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerTrafficSign = async (questionId, choice) => {
+  const guessTrafficSignId = (await query("SELECT id FROM traffic_signs WHERE name = $1", [choice]))[0]["id"];
+  const correctTrafficSignId = (
+    await query(
+      "SELECT t.id FROM traffic_signs t JOIN questions_traffic_sign q on t.id = q.traffic_signs WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["id"];
+
+  let correct = true;
+
+  if (guessTrafficSignId != correctTrafficSignId) {
+    correct = false;
+  }
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_traffic_sign (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerSeason = async (questionId, choice) => {
   const guessSeasonId = (await query("SELECT id FROM seasons WHERE name = $1", [choice]))[0]["id"];
   const realSeasonId = getSeasonId(new Date().getMonth());
@@ -322,6 +462,16 @@ const answerSeason = async (questionId, choice) => {
     choice,
     correct,
   ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerDrivingLicence = async (questionId, choice) => {
+  const userId = (await query("SELECT user_id FROM questions WHERE id = $1", [questionId]))[0]["user_id"];
+
+  // Seteaza campul driving licence
+  await query("UPDATE users SET driving_licence = $1 WHERE id = $2", [choice === "Da", userId]);
 
   // Marcheaza intrebarea drept raspunsa
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
@@ -353,6 +503,19 @@ const choose = async (questionId, choice) => {
       }
 
       await answerSeason(questionId, choice);
+
+      break;
+    case "driving_licence":
+      await answerDrivingLicence(questionId, choice);
+      break;
+    case "traffic_sign":
+      const matchesNoTrafficSign = (await query("SELECT * FROM traffic_signs WHERE name = $1", [choice])).length;
+
+      if (matchesNoTrafficSign != 1) {
+        throw new ServerError("Invalid traffic sign!", 400);
+      }
+
+      await answerTrafficSign(questionId, choice);
 
       break;
   }
@@ -395,8 +558,6 @@ const answerCommonWords = async (questionId, answer) => {
       [questionId]
     )
   )[0]["notify_id"];
-
-  console.log(notifyId);
 
   // Incrementez numarul de raspunsuri
   await query("UPDATE questions_common_words_notify SET answers = answers + 1 WHERE id = $1", [notifyId]);

@@ -184,6 +184,25 @@ def get_profilepic(id):
     return response
 
 
+@app.route('/traffic-sign/<id>', methods=['GET'])
+def get_traffic_sign(id):
+    """
+    Intoarce indicatorul
+    """
+
+    path = database.get_traffic_path(db_connection, id)
+
+    # Aduce imaginea in memorie
+    image = cv2.imread(path[0], cv2.IMREAD_UNCHANGED)
+
+    # Encodeaza imaginea pentru a o putea trimite
+    retval, buffer = cv2.imencode('.png', image)
+    response = base64.b64encode(buffer)
+
+    # Trimite imaginea
+    return response
+
+
 @app.route('/words', methods=['GET'])
 def words():
     """Verifica daca doua cuvinte sunt la fel (dar scrise gresit)"""

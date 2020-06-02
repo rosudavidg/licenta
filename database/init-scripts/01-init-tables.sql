@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
     birthday DATE,
     -- Orasul natal
     hometown VARCHAR (64),
+    -- Detinerea de permis auto,
+    driving_licence BOOLEAN,
     -- Datele utilizatorului au fost prelucrate
     ready BOOLEAN DEFAULT FALSE,
     -- Data la care s-a inregistrat pe platforma
@@ -386,6 +388,45 @@ CREATE TABLE IF NOT EXISTS answers_common_words (
     text TEXT,
     -- Precizia raspunsului
     accuracy FLOAT,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS traffic_signs (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Calea catre imagine
+    path VARCHAR (128) NOT NULL,
+    -- Numele semnului
+    name VARCHAR (128) NOT NULL
+);
+
+-- Intrebarile de tip - recunoastere indicator auto
+CREATE TABLE IF NOT EXISTS questions_traffic_sign (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul indicatorului
+    traffic_signs INTEGER REFERENCES traffic_signs(id)
+);
+
+-- Variantele de raspuns la intrebarile de tip - recunoastere indicator auto
+CREATE TABLE IF NOT EXISTS questions_traffic_sign_choices (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul indicatorului
+    traffic_signs INTEGER REFERENCES traffic_signs(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre indicatoare auto
+CREATE TABLE IF NOT EXISTS answers_traffic_sign (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );

@@ -45,36 +45,91 @@ const create = async (userId) => {
   }
 
   // Daca exista cel putin o fata gasita in pozele utilizatorului
-  if (await anyFace(userId)) {
-    question_types.push("face");
-  }
+  if (await anyFace(userId)) question_types.push("face");
 
-  // TODO: exclude daca in ultima luna s-a completat corect
   // Adauga intrebare de tip season
-  question_types.push("season");
+  if (await canAskSeason(userId)) question_types.push("season");
 
-  // TODO: exclude daca s-a completat corect astazi
   // Adauga intrebare de tip today
-  question_types.push("today");
+  if (await canAskToday(userId)) question_types.push("today");
 
-  // TODO: exclude intrebarea daca s-a raspuns deja
   // Adauga intrebare de tip driving licence
-  question_types.push("driving_licence");
+  if (await canAskDrivingLicence(userId)) question_types.push("driving_licence");
 
-  // TODO: verifica daca are driving licence
-  question_types.push("traffic_sign");
+  // Adauga intrebare de tip traffic_sign
+  if (await canAskTrafficSign(userId)) question_types.push("traffic_sign");
 
-  // TODO: intreaba max 1 data pe saptamana
-  question_types.push("birthday");
+  // Adauga intrebare de tip birthday
+  if (await canAskBirthday(userId)) question_types.push("birthday");
 
-  // TODO: doar daca nu s-a raspuns corect astazi
-  question_types.push("today_date");
+  // Adauga intrebari de tip today_date
+  if (await canAskTodayDate(userId)) question_types.push("today_date");
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
+};
+
+const canAskToday = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date, NOW()::date FROM answers_today a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskBirthday = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date FROM answers_birthday a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND DATE_PART('day', age(NOW()::date, a.created_time::date)) < 7",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskSeason = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date FROM answers_season a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND DATE_PART('month', age(NOW()::date, a.created_time::date)) < 1 AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskTodayDate = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date, NOW()::date FROM answers_today_date a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskDrivingLicence = async (userId) => {
+  const res = (await query("SELECT * FROM users WHERE id = $1 AND driving_licence IS NULL", [userId])).length > 0;
+
+  return res;
+};
+
+const canAskTrafficSign = async (userId) => {
+  const res = (await query("SELECT * FROM users WHERE id = $1 AND driving_licence = TRUE", [userId])).length > 0;
+
+  return res;
 };
 
 const createByType = async (userId, type) => {

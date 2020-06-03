@@ -53,3 +53,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'today_date', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'date';
+
+-- Wrapper pentru jocul de memorie
+INSERT INTO question_types (name, answer_type)
+    SELECT 'memory_game', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'score';

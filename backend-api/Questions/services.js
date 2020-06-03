@@ -65,6 +65,9 @@ const create = async (userId) => {
   // Adauga intrebari de tip today_date
   if (await canAskTodayDate(userId)) question_types.push("today_date");
 
+  // Adauga intrebari de tip memory game
+  question_types.push("memory_game");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -163,6 +166,9 @@ const createByType = async (userId, type) => {
     case "today_date":
       await createTodayDate(userId);
       break;
+    case "memory_game":
+      await createMemoryGame(userId);
+      break;
   }
 };
 
@@ -173,6 +179,16 @@ const createTodayQuestion = async (userId) => {
     type,
     userId,
     "Ce zi a săptămânii este astăzi?",
+  ]);
+};
+
+const createMemoryGame = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'memory_game'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Joc de memorie: urmează șablonul prezentat!",
   ]);
 };
 
@@ -458,6 +474,9 @@ const getActiveQuestion = async (userId) => {
     case "common_words":
       question["type"] = "text";
       break;
+    case "memory_game":
+      question["type"] = "memory_game";
+      break;
     case "driving_licence":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
@@ -719,6 +738,28 @@ const date = async (questionId, date) => {
   }
 };
 
+const answerMemoryGame = async (questionId, score) => {
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_memory_game (question_id, score) VALUES ($1, $2)", [questionId, score]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const score = async (questionId, score) => {
+  const questionType = (
+    await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["type"];
+
+  switch (questionType) {
+    case "memory_game":
+      await answerMemoryGame(questionId, score);
+      break;
+  }
+};
+
 module.exports = {
   activeQuestionExists,
   create,
@@ -729,4 +770,5 @@ module.exports = {
   choose,
   answer,
   date,
+  score,
 };

@@ -1,0 +1,68 @@
+.memory-game {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  margin-top: 30px;
+}
+
+.memory-game-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.memory-game-elem {
+  -webkit-transition: 0.5s;
+  -webkit-appearance: none;
+  outline: none;
+  width: 100%;
+  margin: 10px;
+  height: 80px;
+  width: 80px;
+  cursor: pointer;
+  border-radius: 15px;
+  /* box-shadow: 1px 1px 10px rgb(113, 126, 126); */
+}
+
+.normal {
+  background-color: #cdd1c4;
+}
+
+.set {
+  background-color: #4e8098;
+}
+
+.bad {
+  background-color: red;
+}
+
+.memory-start-button {
+  -webkit-transition: 0.5s;
+  -webkit-appearance: none;
+  margin-top: 20px;
+  align-self: center;
+  text-align: center;
+  flex: none;
+  font-size: large;
+  max-width: 400px;
+  width: 80%;
+  box-sizing: border-box;
+  transition: 0.5s;
+  outline: none;
+  background-color: #4e8098;
+  border: 3px solid #4e8098;
+  color: #cdd1c4;
+  padding: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 1px 1px 10px #424553;
+  border-radius: 15px;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.memory-start-button:hover {
+  box-shadow: 1px 1px 10px #5b5f70;
+}

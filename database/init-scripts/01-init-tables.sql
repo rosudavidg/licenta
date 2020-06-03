@@ -456,3 +456,15 @@ CREATE TABLE IF NOT EXISTS answers_today_date (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Rezultatele utilizatorului la jocul de memorie
+CREATE TABLE IF NOT EXISTS answers_memory_game (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Scorul utilizatorului
+    score INTEGER,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

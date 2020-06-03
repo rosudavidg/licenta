@@ -70,6 +70,16 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
         }
 
         await QuestionsService.date(questionId, date);
+        break;
+      case "score":
+        const { score } = req.body;
+
+        if (score == undefined) {
+          throw new ServerError("Score field is missing!", 400);
+        }
+
+        await QuestionsService.score(questionId, score);
+        break;
     }
 
     res.sendStatus(201);

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./Bot.css";
 import { useHistory } from "react-router-dom";
 import { getProfilepic } from "./Auth.js";
 import { range } from "./Utils.js";
+import MemoryGame from "./MemoryGame.js";
+
+import "./Bot.css";
 
 const Bot = () => {
   const [question, setQuestion] = useState("");
@@ -242,6 +244,9 @@ const Bot = () => {
           {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
           {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
           {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}
+          {question.type === "memory_game" && (
+            <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+          )}
           <div className="bot-choice-container-element back" onClick={onClickBack}>
             Acasă
           </div>

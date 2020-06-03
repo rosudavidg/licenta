@@ -28,7 +28,7 @@ const Nav = (props) => {
     return (
       <>
         <input className="nav-home" type="submit" value="Acasă" onClick={onClickHome}></input>
-        <input className="nav-contact" type="submit" value="Contact" onClick={onClickContact}></input>
+        <input className="nav-contact" type="submit" value="Despre" onClick={onClickContact}></input>
         <input className="nav-signout" type="submit" value="Deconectare" onClick={onClickSignOut}></input>
         <img className="nav-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
       </>
@@ -37,7 +37,7 @@ const Nav = (props) => {
     return (
       <>
         <input className="nav-home" type="submit" value="Acasă" onClick={onClickHome}></input>
-        <input className="nav-contact" type="submit" value="Contact" onClick={onClickContact}></input>
+        <input className="nav-contact" type="submit" value="Despre" onClick={onClickContact}></input>
       </>
     );
   }

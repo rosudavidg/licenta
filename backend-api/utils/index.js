@@ -62,6 +62,14 @@ const createUser = async (token) => {
   axios.post(`http://${host}:${port}${path}`);
 };
 
+const prefetchUser = async (token) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/users/prefetch?token=${token}`;
+
+  await axios.post(`http://${host}:${port}${path}`);
+};
+
 const validateUser = async (token, id) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -104,4 +112,5 @@ module.exports = {
   validateUser,
   getSeasonId,
   shuffle,
+  prefetchUser,
 };

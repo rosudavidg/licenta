@@ -43,6 +43,17 @@ def download_image(url, path, file_name):
         file.write(resp.content)
 
 
+def create_new_dir(data):
+    """Creeare director pentru noul utilizator"""
+
+    # Extrage id-ul utilizatorului
+    user_id = data['profile']['id']
+
+    # Creeare director pentru noul utilizator
+    user_path = '/images/' + user_id
+    os.mkdir(user_path)
+
+
 def save_posts_images(data):
     """
     Functie utilizata pentru a salva imaginile asociate postarilor unui
@@ -57,7 +68,6 @@ def save_posts_images(data):
 
     # Creeare director pentru noul utilizator
     user_path = '/images/' + user_id
-    os.mkdir(user_path)
 
     # Pentru fiecare postare, creeaza un nou director cu numele acesteia
     for post in posts:

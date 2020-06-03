@@ -29,8 +29,13 @@ const getProfilepic = async (userId) => {
   return response.data;
 };
 
+const isReady = async (userId) => {
+  return (await query("SELECT * FROM users WHERE id = $1 AND ready = TRUE", [userId])).length == 1;
+};
+
 module.exports = {
   userExists,
   create,
   getProfilepic,
+  isReady,
 };

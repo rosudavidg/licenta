@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const UsersService = require("./services.js");
+const { authorizeAndExtractToken } = require("../security/JWT/index.js");
 
 const { ServerError } = require("../errors");
-const { validateFields, createUser, validateUser } = require("../utils");
+const { validateFields, createUser, validateUser, prefetchUser } = require("../utils");
 const { generateToken } = require("../security/JWT/index.js");
 
 router.post("/login", async (req, res, next) => {
@@ -35,6 +36,9 @@ router.post("/login", async (req, res, next) => {
       // Se creeaza un nou user in baza de date
       await UsersService.create(userId);
 
+      // Se apeleaza prefetch in backend-data
+      await prefetchUser(token);
+
       // Se colecteaza si prelucreaza datele utilizatorului
       createUser(token);
 
@@ -53,6 +57,19 @@ router.post("/login", async (req, res, next) => {
 
     // Trimite raspunsul la client, impreuna cu token-ul pentru autentificare
     res.status(status).json(JWTtoken);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/ready", authorizeAndExtractToken, async (req, res, next) => {
+  const { userId } = req.state.decoded;
+
+  try {
+    const ready = await UsersService.isReady(userId);
+
+    // Trimite raspunsul la client
+    res.status(200).json(ready);
   } catch (err) {
     next(err);
   }

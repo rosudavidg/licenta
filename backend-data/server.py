@@ -1,5 +1,5 @@
-from facebook_collector import facebook_collect, is_a_valid_facebook_profile
-from file_system import save_posts_images, save_albums_photos, save_profile_picture
+from facebook_collector import facebook_collect, is_a_valid_facebook_profile, facebook_prefetch
+from file_system import save_posts_images, save_albums_photos, save_profile_picture, create_new_dir
 from face_api import get_persons
 from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images, same_word
@@ -43,6 +43,29 @@ def validate_users():
         return Response("False", status=200, mimetype='application/json')
 
 
+@app.route('/users/prefetch', methods=['POST'])
+def prefetch():
+    """Pregatire pentru aducerea datelor"""
+
+    try:
+        # Extrag access-token-ul din cerere
+        token = request.args.get('token')
+
+        # Prefetech data
+        data = facebook_prefetch(token)
+
+        # Adaugare director utilizator
+        create_new_dir(data)
+
+        # Salveaza imaginea de profil (dimensiunea mica)
+        save_profile_picture(data)
+
+    except:
+        return Response("Internal error", status=500, mimetype='application/json')
+
+    return Response("Successfully created", status=201, mimetype='application/json')
+
+
 @app.route('/users', methods=['POST'])
 def index():
     """Adaugarea unui nou utilizator in sistem"""
@@ -64,9 +87,6 @@ def index():
 
         # Salveaza pozele din albume (pe disk)
         save_albums_photos(data)
-
-        # Salveaza imaginea de profil (dimensiunea mica)
-        save_profile_picture(data)
 
         # Salvez profilul utilizatorului
         database.insert_profile(db_connection, data['profile'])

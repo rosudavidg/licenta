@@ -3,6 +3,7 @@ import Header from "./Header";
 import Content from "./Content";
 import Footer from "./Footer";
 import Login from "./Login";
+import Bot from "./Bot";
 import Home from "./Home";
 import { Helmet } from "react-helmet";
 
@@ -33,6 +34,17 @@ function App() {
                       return <Login setLoggedIn={setLoggedIn} />;
                     } else {
                       return <Redirect to="/"></Redirect>;
+                    }
+                  }}
+                />
+                <Route
+                  exact
+                  path="/bot"
+                  render={() => {
+                    if (!loggedIn) {
+                      return <Login setLoggedIn={setLoggedIn} />;
+                    } else {
+                      return <Bot />;
                     }
                   }}
                 />

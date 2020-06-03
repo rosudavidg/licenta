@@ -350,6 +350,24 @@ def facebook_collect(token):
     except:
         raise Exception('Something Bad Happened.')
 
+def facebook_prefetch(token):
+    """
+    Colecteaza profilul utilizatorului
+    In caz de eroare, se arunca o exceptie generica.
+    """
+
+    try:
+        graph = facebook.GraphAPI(token)
+
+        profile = collect_user_profile(graph)
+
+        data = {
+            'profile': profile,
+        }
+
+        return data
+    except:
+        raise Exception('Something Bad Happened.')
 
 def is_a_valid_facebook_profile(token, id):
     """

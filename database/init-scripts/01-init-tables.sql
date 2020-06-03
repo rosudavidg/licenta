@@ -430,3 +430,15 @@ CREATE TABLE IF NOT EXISTS answers_traffic_sign (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Raspunsurile utilizatorilor la intrebarile despre ziua de nastere
+CREATE TABLE IF NOT EXISTS answers_birthday (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    date DATE,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

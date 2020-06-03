@@ -62,6 +62,14 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
         await QuestionsService.answer(questionId, answer);
 
         break;
+      case "date":
+        const { date } = req.body;
+
+        if (date == undefined) {
+          throw new ServerError("Date field is missing!", 400);
+        }
+
+        await QuestionsService.date(questionId, date);
     }
 
     res.sendStatus(201);

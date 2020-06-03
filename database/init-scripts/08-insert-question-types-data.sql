@@ -41,3 +41,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'traffic_sign', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare tip zi de nastere
+INSERT INTO question_types (name, answer_type)
+    SELECT 'birthday', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'date';

@@ -64,6 +64,9 @@ const create = async (userId) => {
   // TODO: verifica daca are driving licence
   question_types.push("traffic_sign");
 
+  // TODO: intreaba max 1 data pe saptamana
+  question_types.push("birthday");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -95,6 +98,9 @@ const createByType = async (userId, type) => {
       break;
     case "traffic_sign":
       await createTrafficSign(userId);
+      break;
+    case "birthday":
+      await createBirthday(userId);
       break;
   }
 };
@@ -147,6 +153,17 @@ const createCommonWordsNotify = async (userId) => {
 
   // Adauga detaliile pentru intrebare
   await query("INSERT INTO questions_common_words_notify (id, words) VALUES ($1, $2)", [questionId, elements]);
+};
+
+const createBirthday = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'birthday'"))[0]["id"];
+
+  // Adauga intrebarea generica
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Când este ziua ta de naștere?",
+  ]);
 };
 
 const createDrivingLicence = async (userId) => {
@@ -307,6 +324,10 @@ const getActiveQuestion = async (userId) => {
 
       question["message"] += wordsList + "!";
       question["image_type"] = "jpg";
+      break;
+    case "birthday":
+      question["type"] = "date";
+
       break;
     case "today":
       const days_of_the_week = await query("SELECT name FROM days_of_the_week");
@@ -529,6 +550,14 @@ const answerFace = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerBirthday = async (questionId, date) => {
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_birthday (question_id, date) VALUES ($1, $2)", [questionId, date]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerCommonWords = async (questionId, answer) => {
   // Parseaza lista de cuvinte
   const words = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0);
@@ -583,6 +612,21 @@ const answer = async (questionId, answer) => {
   }
 };
 
+const date = async (questionId, date) => {
+  const questionType = (
+    await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["type"];
+
+  switch (questionType) {
+    case "birthday":
+      console.log(date);
+      await answerBirthday(questionId, date);
+      break;
+  }
+};
+
 module.exports = {
   activeQuestionExists,
   create,
@@ -592,4 +636,5 @@ module.exports = {
   confirm,
   choose,
   answer,
+  date,
 };

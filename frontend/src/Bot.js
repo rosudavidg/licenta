@@ -3,6 +3,7 @@ import axios from "axios";
 import "./Bot.css";
 import { useHistory } from "react-router-dom";
 import { getProfilepic } from "./Auth.js";
+import { range } from "./Utils.js";
 
 const Bot = () => {
   const [question, setQuestion] = useState("");
@@ -87,6 +88,26 @@ const Bot = () => {
       });
   };
 
+  const answerDateQuestion = async (question, date, setQuestion) => {
+    const jwt_token = localStorage.getItem("token");
+    await axios
+      .post(
+        `/questions/${question.id}/answer`,
+        { date: date },
+        {
+          headers: {
+            Authorization: `Bearer ${jwt_token}`,
+          },
+        }
+      )
+      .then(() => {
+        getQuestion(setQuestion);
+      })
+      .catch((e) => {
+        alert(`Answer question failed!\nError: ${e.response.data.error}`);
+      });
+  };
+
   const ChoiceComponent = ({ question, setQuestion }) => {
     return (
       <div className="bot-choice-container">
@@ -136,6 +157,73 @@ const Bot = () => {
     );
   };
 
+  const DateComponent = ({ question, setQuestion }) => {
+    const [day, setDay] = useState(1);
+    const [month, setMonth] = useState(1);
+    const [year, setYear] = useState(1900);
+
+    const days = range(1, 32);
+    const months = range(1, 13);
+    const years = range(1900, 2021);
+
+    const changeDay = (event) => {
+      setDay(event.target.value);
+    };
+
+    const changeMonth = (event) => {
+      setMonth(event.target.value);
+    };
+
+    const changeYear = (event) => {
+      setYear(event.target.value);
+    };
+
+    return (
+      <>
+        <p className="selectors">
+          <label>Ziua:</label>
+          <select id="day-selector" className="bot-select" onChange={changeDay}>
+            {days.map((elem, id) => {
+              return (
+                <option className="bot-select-option" key={id} value={elem}>
+                  {elem}
+                </option>
+              );
+            })}
+          </select>
+          <label>Luna:</label>
+          <select id="month-selector" className="bot-select" onChange={changeMonth}>
+            {months.map((elem, id) => {
+              return (
+                <option key={id} value={elem}>
+                  {elem}
+                </option>
+              );
+            })}
+          </select>
+
+          <label>Anul:</label>
+          <select id="year-selector" className="bot-select" onChange={changeYear}>
+            {years.map((elem, id) => {
+              return (
+                <option key={id} value={elem}>
+                  {elem}
+                </option>
+              );
+            })}
+          </select>
+        </p>
+
+        <div
+          className="bot-choice-container-element"
+          onClick={(e) => answerDateQuestion(question, `${year}-${month}-${day}`, setQuestion)}
+        >
+          Trimite
+        </div>
+      </>
+    );
+  };
+
   const onClickBack = () => {
     history.push("/");
   };
@@ -150,6 +238,7 @@ const Bot = () => {
         </div>
         <div className="bot-answer">
           <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+          {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
           {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
           {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
           {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}

@@ -8,3 +8,6 @@ INSERT INTO answer_types (name) VALUES ('confirm');
 
 -- Raspuns de tip alegere
 INSERT INTO answer_types (name) VALUES ('choice');
+
+-- Raspuns de tip data
+INSERT INTO answer_types (name) VALUES ('date');

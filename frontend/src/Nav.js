@@ -1,5 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { getProfilepic } from "./Auth.js";
 import "./Nav.css";
 
 const Nav = (props) => {
@@ -26,11 +27,10 @@ const Nav = (props) => {
   if (props.loggedIn) {
     return (
       <>
-        <div>
-          <input className="nav-home" type="submit" value="Acasă" onClick={onClickHome}></input>
-          <input className="nav-contact" type="submit" value="Contact" onClick={onClickContact}></input>
-          <input className="nav-signout" type="submit" value="Deconectare" onClick={onClickSignOut}></input>
-        </div>
+        <input className="nav-home" type="submit" value="Acasă" onClick={onClickHome}></input>
+        <input className="nav-contact" type="submit" value="Contact" onClick={onClickContact}></input>
+        <input className="nav-signout" type="submit" value="Deconectare" onClick={onClickSignOut}></input>
+        <img className="nav-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
       </>
     );
   } else {

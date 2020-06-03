@@ -77,6 +77,26 @@ def get_all_images(data):
     return images
 
 
+def adapt_romanian_characters(word):
+    mapping = {
+        'ă': 'a',
+        'â': 'a',
+        'î': 'i',
+        'ș': 's',
+        'ț': 't'
+    }
+
+    new_word = ''
+
+    for letter in word:
+        if letter in mapping:
+            new_word += mapping[letter]
+        else:
+            new_word += letter
+
+    return new_word
+
+
 def same_word(word1, word2):
     threshold = 0.92
     keys = {
@@ -108,8 +128,8 @@ def same_word(word1, word2):
         'm': {'x': 6, 'y': 2},
     }
 
-    word1 = word1.lower()
-    word2 = word2.lower()
+    word1 = adapt_romanian_characters(word1.lower())
+    word2 = adapt_romanian_characters(word2.lower())
 
     if len(word1) != len(word2):
         return False

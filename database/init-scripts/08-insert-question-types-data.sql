@@ -47,3 +47,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'birthday', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'date';
+
+-- Intrebare recunoastere data de astazi
+INSERT INTO question_types (name, answer_type)
+    SELECT 'today_date', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'date';

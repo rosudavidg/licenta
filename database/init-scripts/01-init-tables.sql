@@ -442,3 +442,17 @@ CREATE TABLE IF NOT EXISTS answers_birthday (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Raspunsurile utilizatorilor la intrebarile despre data de astazi
+CREATE TABLE IF NOT EXISTS answers_today_date (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    date DATE,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

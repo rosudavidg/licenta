@@ -67,6 +67,9 @@ const create = async (userId) => {
   // TODO: intreaba max 1 data pe saptamana
   question_types.push("birthday");
 
+  // TODO: doar daca nu s-a raspuns corect astazi
+  question_types.push("today_date");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -102,6 +105,9 @@ const createByType = async (userId, type) => {
     case "birthday":
       await createBirthday(userId);
       break;
+    case "today_date":
+      await createTodayDate(userId);
+      break;
   }
 };
 
@@ -112,6 +118,16 @@ const createTodayQuestion = async (userId) => {
     type,
     userId,
     "Ce zi a săptămânii este astăzi?",
+  ]);
+};
+
+const createTodayDate = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'today_date'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "În ce dată suntem astăzi?",
   ]);
 };
 
@@ -326,6 +342,10 @@ const getActiveQuestion = async (userId) => {
       question["image_type"] = "jpg";
       break;
     case "birthday":
+      question["type"] = "date";
+
+      break;
+    case "today_date":
       question["type"] = "date";
 
       break;
@@ -558,6 +578,21 @@ const answerBirthday = async (questionId, date) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerTodayDate = async (questionId, date) => {
+  const guessDate = new Date(date);
+  const correct = guessDate.toDateString() === new Date().toDateString();
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_today_date (question_id, date, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    date,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerCommonWords = async (questionId, answer) => {
   // Parseaza lista de cuvinte
   const words = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0);
@@ -621,8 +656,10 @@ const date = async (questionId, date) => {
 
   switch (questionType) {
     case "birthday":
-      console.log(date);
       await answerBirthday(questionId, date);
+      break;
+    case "today_date":
+      await answerTodayDate(questionId, date);
       break;
   }
 };

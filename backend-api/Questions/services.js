@@ -360,7 +360,7 @@ const getTrafficSign = async (trafficSignId) => {
 const getAccuracy = async (target, guessed) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
-  const path = `/words_accuracy?target=${target}&guessed=${guessed}`;
+  const path = encodeURI(`/words_accuracy?target=${target}&guessed=${guessed}`);
 
   // Cerere catre backend-data pentru a calcula acuratetea
   const response = await axios.get(`http://${host}:${port}${path}`);

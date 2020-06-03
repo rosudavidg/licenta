@@ -247,9 +247,6 @@ const Bot = () => {
           {question.type === "memory_game" && (
             <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
           )}
-          <div className="bot-choice-container-element back" onClick={onClickBack}>
-            Acasă
-          </div>
         </div>
       </div>
     </>

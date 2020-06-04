@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 
 import "./Home.css";
 
-const getReady = async (setReady) => {
+const sleep = (milliseconds) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
+
+const getReady = async (ready, setReady) => {
   const jwt_token = localStorage.getItem("token");
 
   axios
@@ -13,8 +19,13 @@ const getReady = async (setReady) => {
         Authorization: `Bearer ${jwt_token}`,
       },
     })
-    .then((res) => {
+    .then(async (res) => {
       setReady(res.data);
+
+      if (res.data != true) {
+        await sleep(5000);
+        getReady(ready, setReady);
+      }
     })
     .catch((e) => {
       alert(`Get ready field failed!\nError: ${e.response.data.error}`);
@@ -26,7 +37,7 @@ const Home = () => {
   const [ready, setReady] = useState(true);
 
   useEffect(() => {
-    getReady(setReady);
+    getReady(ready, setReady);
   }, []);
 
   const onClickBot = () => {
@@ -50,7 +61,6 @@ const Home = () => {
           {ready && (
             <>
               <div className="home-button" onClick={onClickBot}>
-                {" "}
                 Antrenează-ți mintea!
               </div>
               <div className="home-button"> Statistici</div>
@@ -58,8 +68,14 @@ const Home = () => {
           )}
           {!ready && (
             <>
-              <div className="home-button deactivated"> Antrenează-ți mintea!</div>
-              <div className="home-button deactivated"> Statistici</div>
+              <div className="home-button deactivated">
+                <FontAwesomeIcon icon={faLock} className="lock" />
+                Antrenează-ți mintea!
+              </div>
+              <div className="home-button deactivated">
+                <FontAwesomeIcon icon={faLock} className="lock" />
+                Statistici
+              </div>
               <p>Momentan, lucrăm la setările contului dumneavoastră. Vom fi gata în 2 minute!</p>
             </>
           )}

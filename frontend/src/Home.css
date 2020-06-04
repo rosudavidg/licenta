@@ -64,4 +64,10 @@
 .deactivated {
   background-color: rgb(187, 81, 81);
   border: 3px solid rgb(187, 81, 81);
+  text-align: center;
+  flex-direction: column;
+}
+
+.lock {
+  margin-right: 10px;
 }

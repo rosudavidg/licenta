@@ -48,7 +48,7 @@ services:
       - secret_jwt_key
   backend-data:
     depends_on:
-      - database
+      - "database"
     build:
       dockerfile: Dockerfile
       context: ./backend-data

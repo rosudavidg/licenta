@@ -40,8 +40,15 @@ RUN mkdir /images
 RUN mkdir /traffic-signs
 COPY traffic-signs/ /traffic-signs/
 
+# Adaugare animale
+RUN mkdir /animals
+COPY animals/ /animals/
+
+# Adauga wait-for-it
+COPY wait-for-it.sh /
+
 # Expunerea portului pe care ruleaza serviciul
 EXPOSE 5000
 
 # Rularea serviciului
-CMD ["python3", "-W", "ignore", "/usr/src/app/server.py"]
+CMD ["./wait-for-it.sh", "database:5432", "--", "python3", "-W", "ignore", "/usr/src/app/server.py"]

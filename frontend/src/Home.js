@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getFirstName } from "./Auth.js";
 import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
@@ -47,7 +48,7 @@ const Home = () => {
   return (
     <div className="home-container">
       <div className="home-message">
-        <p>Salut!</p>
+        <p>Salut, {getFirstName()}!</p>
         <p>Bine ai venit pe Avatario!</p>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id libero ultricies, pretium risus id, vulputate

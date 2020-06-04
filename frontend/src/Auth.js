@@ -7,3 +7,7 @@ export function isUserAuthenticated() {
 export function getProfilepic() {
   return jwt_decode(localStorage.getItem("token")).profilepic;
 }
+
+export function getFirstName() {
+  return jwt_decode(localStorage.getItem("token")).firstName;
+}

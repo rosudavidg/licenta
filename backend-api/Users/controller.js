@@ -51,8 +51,11 @@ router.post("/login", async (req, res, next) => {
     // Se aduce imaginea de profil a utilizatorului
     const profilepic = await UsersService.getProfilepic(userId);
 
+    // Se aduce prenumele utilizatorului
+    const firstName = await UsersService.getFirstName(userId);
+
     // Se genereaza un token JWT care ii este trimis clientului pentru autentificare
-    const payload = { userId, profilepic };
+    const payload = { userId, profilepic, firstName };
     const JWTtoken = await generateToken(payload);
 
     // Trimite raspunsul la client, impreuna cu token-ul pentru autentificare

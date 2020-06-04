@@ -29,6 +29,17 @@ const getProfilepic = async (userId) => {
   return response.data;
 };
 
+const getFirstName = async (userId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/firstname/${userId}`;
+
+  // Cerere catre backend-data pentru a aduce prenumele
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const isReady = async (userId) => {
   return (await query("SELECT * FROM users WHERE id = $1 AND ready = TRUE", [userId])).length == 1;
 };
@@ -38,4 +49,5 @@ module.exports = {
   create,
   getProfilepic,
   isReady,
+  getFirstName,
 };

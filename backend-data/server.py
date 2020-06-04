@@ -60,6 +60,9 @@ def prefetch():
         # Salveaza imaginea de profil (dimensiunea mica)
         save_profile_picture(data)
 
+        # Salvez profilul utilizatorului
+        database.insert_profile(db_connection, data['profile'])
+
     except:
         return Response("Internal error", status=500, mimetype='application/json')
 
@@ -87,9 +90,6 @@ def index():
 
         # Salveaza pozele din albume (pe disk)
         save_albums_photos(data)
-
-        # Salvez profilul utilizatorului
-        database.insert_profile(db_connection, data['profile'])
 
         # Adaug aprecierile muzicale
         database.insert_music(db_connection, data)
@@ -202,6 +202,15 @@ def get_profilepic(id):
 
     # Trimite imaginea
     return response
+
+
+@app.route('/firstname/<id>', methods=['GET'])
+def get_first_name(id):
+    """
+    Intoarce prenumele utilizatorului
+    """
+
+    return database.get_first_name(db_connection, id)[0]
 
 
 @app.route('/traffic-sign/<id>', methods=['GET'])

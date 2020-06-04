@@ -65,6 +65,9 @@ const create = async (userId) => {
   // Adauga intrebari de tip today_date
   if (await canAskTodayDate(userId)) question_types.push("today_date");
 
+  // Adauga intrebari de tip animal
+  question_types.push("animal");
+
   // Adauga intrebari de tip memory game
   question_types.push("memory_game");
 
@@ -168,6 +171,9 @@ const createByType = async (userId, type) => {
       break;
     case "memory_game":
       await createMemoryGame(userId);
+      break;
+    case "animal":
+      await createAnimal(userId);
       break;
   }
 };
@@ -306,6 +312,28 @@ const createFaceQuestion = async (userId) => {
   await query("INSERT INTO questions_face (id, face_id) VALUES ($1, $2)", [questionId, faceId]);
 };
 
+const createAnimal = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'animal'"))[0]["id"];
+
+  // Extrage toate animalele posibile
+  const animals = await query("SELECT id FROM animals");
+
+  // Alege un animal random
+  const animalId = animals[Math.floor(Math.random() * animals.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Ce animal este în imagine?",
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_animal (id, animal_id) VALUES ($1, $2)", [questionId, animalId]);
+};
+
 const createTrafficSign = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'traffic_sign'"))[0]["id"];
 
@@ -362,6 +390,17 @@ const getImage = async (faceId) => {
   return response.data;
 };
 
+const getAnimal = async (animalId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/animal/${animalId}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getTrafficSign = async (trafficSignId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -411,6 +450,15 @@ const getActiveQuestion = async (userId) => {
 
       question["message"] += wordsList + "!";
       question["image_type"] = "jpg";
+      break;
+    case "animal":
+      const animalId = (await query("SELECT animal_id FROM questions_animal WHERE id = $1", [questionId]))[0][
+        "animal_id"
+      ];
+      question["type"] = "text";
+
+      question["image"] = await getAnimal(animalId);
+
       break;
     case "birthday":
       question["type"] = "date";
@@ -704,6 +752,33 @@ const answerCommonWords = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerAnimal = async (questionId, answer) => {
+  // Parseaza cuvantul
+  const name = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0)[0];
+
+  // Extrag numele animalului
+  const realName = (
+    await query(
+      "SELECT at.name FROM questions_animal q JOIN animals a ON q.animal_id = a.id JOIN animal_types at ON a.animal_type = at.id WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["name"];
+
+  // Calculez precizia raspunsului
+  const accuracy = await getAccuracy(realName, name);
+  const correct = accuracy === 1;
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_animal (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    name,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answer = async (questionId, answer) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -717,6 +792,9 @@ const answer = async (questionId, answer) => {
       break;
     case "common_words":
       await answerCommonWords(questionId, answer);
+      break;
+    case "animal":
+      await answerAnimal(questionId, answer);
       break;
   }
 };

@@ -468,3 +468,43 @@ CREATE TABLE IF NOT EXISTS answers_memory_game (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Tipurile de animale
+CREATE TABLE IF NOT EXISTS animal_types (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Numele animalului
+    name VARCHAR (64)
+);
+
+-- Pozele cu animale
+CREATE TABLE IF NOT EXISTS animals (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Id al tipului de animal
+    animal_type BIGINT REFERENCES animal_types(id),
+    -- Calea absoluta la care se afla imaginea
+    path VARCHAR (128) NOT NULL
+);
+
+-- Intrebarile de tip - recunoastere animal
+CREATE TABLE IF NOT EXISTS questions_animal (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul animalului
+    animal_id INTEGER REFERENCES animals(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre animale
+CREATE TABLE IF NOT EXISTS answers_animal (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

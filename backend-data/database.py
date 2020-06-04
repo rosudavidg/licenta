@@ -463,10 +463,27 @@ def set_ready(connection, user_id):
 
     cursor.close()
 
+
 def get_traffic_path(connection, id):
     cursor = connection.cursor()
 
     sql = ("SELECT path FROM traffic_signs WHERE id = %s")
+    val = (id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchone()
+    except:
+        connection.rollback()
+        return None
+
+
+def get_animal_path(connection, id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT path FROM animals WHERE id = %s")
     val = (id, )
 
     try:

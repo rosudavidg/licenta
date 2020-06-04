@@ -59,3 +59,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'memory_game', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'score';
+
+-- Intrebare recunoastere animal
+INSERT INTO question_types (name, answer_type)
+    SELECT 'animal', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

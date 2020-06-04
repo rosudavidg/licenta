@@ -104,9 +104,9 @@
   box-sizing: border-box;
   transition: 0.5s;
   outline: none;
-  background-color: #4e8098;
-  border: 3px solid #4e8098;
-  color: #cdd1c4;
+  background-color: #cdd1c4;
+  border: 3px solid #cdd1c4;
+  color: #30323d;
   padding: 8px;
   text-decoration: none;
   cursor: pointer;
@@ -158,4 +158,15 @@
 .selectors {
   display: flex;
   justify-content: space-evenly;
+}
+
+.bot-message-images-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.bot-message-images {
+  width: 50%;
+  height: 50%;
 }

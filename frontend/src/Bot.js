@@ -236,6 +236,12 @@ const Bot = () => {
         <div className="bot-message">
           <img className="bot-message-icon" src="laptop.jpg" />
           {question.image && <img className="bot-message-image" src={`data:image/png;base64,${question.image}`} />}
+          {question.images && (
+            <div className="bot-message-images-container">
+              <img className="bot-message-images" src={`data:image/png;base64,${question.images[0]}`} />
+              <img className="bot-message-images" src={`data:image/png;base64,${question.images[1]}`} />
+            </div>
+          )}
           <div className="bot-message-text">{question.message}</div>
         </div>
         <div className="bot-answer">

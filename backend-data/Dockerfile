@@ -44,6 +44,10 @@ COPY traffic-signs/ /traffic-signs/
 RUN mkdir /animals
 COPY animals/ /animals/
 
+# Adaugare zaruri
+RUN mkdir /dices
+COPY dices/ /dices/
+
 # Adauga wait-for-it
 COPY wait-for-it.sh /
 

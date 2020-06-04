@@ -494,3 +494,19 @@ def get_animal_path(connection, id):
     except:
         connection.rollback()
         return None
+
+
+def get_dice_path(connection, id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT path FROM dices WHERE id = %s")
+    val = (id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchone()
+    except:
+        connection.rollback()
+        return None

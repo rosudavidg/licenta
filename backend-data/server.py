@@ -242,6 +242,25 @@ def get_animal(id):
     return response
 
 
+@app.route('/dice/<id>', methods=['GET'])
+def get_dice(id):
+    """
+    Intoarce zarul
+    """
+
+    path = database.get_dice_path(db_connection, id)
+
+    # Aduce imaginea in memorie
+    image = cv2.imread(path[0], cv2.IMREAD_UNCHANGED)
+
+    # Encodeaza imaginea pentru a o putea trimite
+    retval, buffer = cv2.imencode('.png', image)
+    response = base64.b64encode(buffer)
+
+    # Trimite imaginea
+    return response
+
+
 @app.route('/words', methods=['GET'])
 def words():
     """Verifica daca doua cuvinte sunt la fel (dar scrise gresit)"""

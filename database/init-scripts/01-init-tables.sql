@@ -508,3 +508,37 @@ CREATE TABLE IF NOT EXISTS answers_animal (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Zarurile
+CREATE TABLE IF NOT EXISTS dices (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Valoarea zarului
+    value INTEGER,
+    -- Calea absoluta la care se afla imaginea
+    path VARCHAR (128) NOT NULL
+);
+
+-- Intrebarile de tip - recunoastere zaruri
+CREATE TABLE IF NOT EXISTS questions_dices (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul primului zar
+    first_dice_id INTEGER REFERENCES dices(id),
+    -- Id-ul celui de-al doilea zar
+    second_dice_id INTEGER REFERENCES dices(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre zaruri
+CREATE TABLE IF NOT EXISTS answers_dices (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

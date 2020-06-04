@@ -71,6 +71,9 @@ const create = async (userId) => {
   // Adauga intrebari de tip memory game
   question_types.push("memory_game");
 
+  // Adauga intrebari de tip zaruri
+  question_types.push("dices");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -174,6 +177,9 @@ const createByType = async (userId, type) => {
       break;
     case "animal":
       await createAnimal(userId);
+      break;
+    case "dices":
+      await createDices(userId);
       break;
   }
 };
@@ -334,6 +340,33 @@ const createAnimal = async (userId) => {
   await query("INSERT INTO questions_animal (id, animal_id) VALUES ($1, $2)", [questionId, animalId]);
 };
 
+const createDices = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'dices'"))[0]["id"];
+
+  // Extrage toate zarurile posibile
+  const dices = await query("SELECT id FROM dices");
+
+  // Alege doua zaruri random
+  const firstDiceId = dices[Math.floor(Math.random() * dices.length)]["id"];
+  const secondDiceId = dices[Math.floor(Math.random() * dices.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Cât este suma zarurilor?",
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_dices (id, first_dice_id, second_dice_id) VALUES ($1, $2, $3)", [
+    questionId,
+    firstDiceId,
+    secondDiceId,
+  ]);
+};
+
 const createTrafficSign = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'traffic_sign'"))[0]["id"];
 
@@ -401,6 +434,17 @@ const getAnimal = async (animalId) => {
   return response.data;
 };
 
+const getDice = async (diceId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/dice/${diceId}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getTrafficSign = async (trafficSignId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -455,9 +499,22 @@ const getActiveQuestion = async (userId) => {
       const animalId = (await query("SELECT animal_id FROM questions_animal WHERE id = $1", [questionId]))[0][
         "animal_id"
       ];
+
       question["type"] = "text";
 
       question["image"] = await getAnimal(animalId);
+
+      break;
+    case "dices":
+      const firstDiceId = (await query("SELECT first_dice_id FROM questions_dices WHERE id = $1", [questionId]))[0][
+        "first_dice_id"
+      ];
+      const secondDiceId = (await query("SELECT second_dice_id FROM questions_dices WHERE id = $1", [questionId]))[0][
+        "second_dice_id"
+      ];
+
+      question["type"] = "text";
+      question["images"] = [await getDice(firstDiceId), await getDice(secondDiceId)];
 
       break;
     case "birthday":
@@ -779,6 +836,36 @@ const answerAnimal = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerDices = async (questionId, answer) => {
+  // Extrage primul zar
+  const firstDiceValue = (
+    await query("SELECT d.value FROM questions_dices q JOIN dices d ON q.first_dice_id = d.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["value"];
+
+  // Extrage al doilea zar
+  const secondDiceValue = (
+    await query("SELECT d.value FROM questions_dices q JOIN dices d ON q.second_dice_id = d.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["value"];
+
+  const correctSum = firstDiceValue + secondDiceValue;
+
+  const correct = correctSum === Number(answer);
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_dices (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answer = async (questionId, answer) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -795,6 +882,9 @@ const answer = async (questionId, answer) => {
       break;
     case "animal":
       await answerAnimal(questionId, answer);
+      break;
+    case "dices":
+      await answerDices(questionId, answer);
       break;
   }
 };

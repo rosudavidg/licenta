@@ -15,7 +15,6 @@ const MemoryGame = (props) => {
     [0, 0, 0, 0],
   ]);
   const [clickable, setClickable] = useState(false);
-  const [score, setScore] = useState(0);
   const [currentElem, setCurrentElem] = useState(0);
   const [running, setRunning] = useState(false);
   const [randomSelected, setRandomSelected] = useState([]);
@@ -36,6 +35,17 @@ const MemoryGame = (props) => {
         }
       )
       .then(() => {
+        setElems([
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ]);
+        setClickable(false);
+        setCurrentElem(0);
+        setRunning(false);
+        setRandomSelected([]);
+
         getQuestion(setQuestion);
       })
       .catch((e) => {

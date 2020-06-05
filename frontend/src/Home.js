@@ -49,7 +49,14 @@ const Home = () => {
     <div className="home-container">
       <div className="home-message">
         <p>Salut, {getFirstName()}!</p>
-        <p>Bine ai venit pe Avatario!</p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id libero ultricies, pretium risus id, vulputate
+          ex. Donec consequat eget lacus quis venenatis. Morbi quis lorem ut sapien ultricies laoreet ut eu urna. Nullam
+          posuere mollis lobortis. Sed vitae nisi vitae nisl dapibus malesuada a vel nisi. Vestibulum ante ipsum primis
+          in faucibus orci luctus et ultrices posuere cubilia curae; Donec metus nulla, vestibulum id scelerisque at,
+          scelerisque quis velit. Nunc ullamcorper congue varius. Donec vitae finibus metus. Donec venenatis tempus
+          massa, et gravida sem tempus nec. Vivamus rhoncus magna nec suscipit feugiat.
+        </p>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id libero ultricies, pretium risus id, vulputate
           ex. Donec consequat eget lacus quis venenatis. Morbi quis lorem ut sapien ultricies laoreet ut eu urna. Nullam
@@ -69,6 +76,8 @@ const Home = () => {
           )}
           {!ready && (
             <>
+              <p>Momentan, lucrăm la setările contului tău. Imediat ce vom termina, vei putea folosi aplicația!</p>
+
               <div className="home-button deactivated">
                 <FontAwesomeIcon icon={faLock} className="lock" />
                 Antrenează-ți mintea!
@@ -77,7 +86,6 @@ const Home = () => {
                 <FontAwesomeIcon icon={faLock} className="lock" />
                 Statistici
               </div>
-              <p>Momentan, lucrăm la setările contului dumneavoastră. Vom fi gata în 2 minute!</p>
             </>
           )}
         </p>

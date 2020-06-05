@@ -16,12 +16,8 @@ const Nav = (props) => {
     history.push("/");
   };
 
-  const onClickFAQ = () => {
-    history.push("/faq");
-  };
-
   const onClickContact = () => {
-    history.push("/contact");
+    history.push("/about");
   };
 
   if (props.loggedIn) {

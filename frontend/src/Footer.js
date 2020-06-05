@@ -1,5 +1,6 @@
 import React from "react";
 import "./Footer.css";
+import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faCookie } from "@fortawesome/free-solid-svg-icons";
@@ -28,7 +29,7 @@ const FooterEmail = () => {
 
 const TermsLink = (props) => {
   return (
-    <div className="footer-terms f-terms" onClick={props.redirect}>
+    <div className="footer-terms f-terms" onClick={() => props.history.push("/terms")}>
       <FontAwesomeIcon icon={faCookie} />
       <div className="footer-facebook-email">Termeni și condiții</div>
     </div>
@@ -36,12 +37,14 @@ const TermsLink = (props) => {
 };
 
 const Footer = () => {
+  const history = useHistory();
+
   return (
     <div className="footer">
       <div className="footer-contact">
         <FooterFacebook />
         <FooterEmail />
-        <TermsLink />
+        <TermsLink history={history} />
       </div>
       <div className="footer-copyright">&copy; 2020 Avatario</div>
     </div>

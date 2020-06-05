@@ -5,6 +5,8 @@ import Footer from "./Footer";
 import Login from "./Login";
 import Bot from "./Bot";
 import Home from "./Home";
+import About from "./About";
+import Terms from "./Terms";
 import { Helmet } from "react-helmet";
 
 import { isUserAuthenticated } from "./Auth.js";
@@ -14,6 +16,7 @@ import "./App.css";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(isUserAuthenticated());
+  const [termsAccepted, setTermsAccepted] = useState(localStorage.getItem("gdpr") === "true");
 
   return (
     <>
@@ -26,6 +29,13 @@ function App() {
           <div className="content-footer">
             <Content>
               <Switch>
+                {!termsAccepted && (
+                  <Route
+                    render={() => {
+                      return <Terms callback={setTermsAccepted} />;
+                    }}
+                  />
+                )}
                 <Route
                   exact
                   path="/login"
@@ -35,6 +45,20 @@ function App() {
                     } else {
                       return <Redirect to="/"></Redirect>;
                     }
+                  }}
+                />
+                <Route
+                  exact
+                  path="/terms"
+                  render={() => {
+                    return <Terms />;
+                  }}
+                />
+                <Route
+                  exact
+                  path="/about"
+                  render={() => {
+                    return <About />;
                   }}
                 />
                 <Route

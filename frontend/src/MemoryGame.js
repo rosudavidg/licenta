@@ -176,9 +176,16 @@ const MemoryGame = (props) => {
           </div>
         );
       })}
-      <div className="memory-start-button" onClick={startGame}>
-        Start!
-      </div>
+      {!running && (
+        <div className="memory-start-button" onClick={startGame}>
+          Start!
+        </div>
+      )}
+      {running && (
+        <div className="memory-start-button-disabled" onClick={startGame}>
+          Start!
+        </div>
+      )}
     </div>
   );
 };

@@ -30,7 +30,6 @@
   padding: 30px;
   text-align: center;
   margin-top: 40px;
-  z-index: 1;
 }
 
 .bot-message-text {
@@ -128,7 +127,7 @@
   align-self: center;
   text-align: center;
   flex: none;
-  font-size: large;
+  font-size: 16px;
   max-width: 400px;
   width: 80%;
   box-sizing: border-box;
@@ -137,7 +136,7 @@
   background-color: #cdd1c4;
   border: 3px solid #cdd1c4;
   color: #30323d;
-  padding: 8px;
+  padding: 6px;
   text-decoration: none;
   cursor: pointer;
   letter-spacing: 1px;

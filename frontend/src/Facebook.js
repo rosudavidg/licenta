@@ -9,8 +9,6 @@ const Facebook = (props) => {
   const history = useHistory();
 
   const loginCallback = (response) => {
-    console.log(response);
-
     axios
       .post("/users/login", {
         userId: response.id,

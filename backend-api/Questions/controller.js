@@ -80,6 +80,15 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
 
         await QuestionsService.score(questionId, score);
         break;
+      case "image":
+        const { image } = req.body;
+
+        if (image == undefined) {
+          throw new ServerError("Image field is missing!", 400);
+        }
+
+        await QuestionsService.image(questionId, image, userId);
+        break;
     }
 
     res.sendStatus(201);

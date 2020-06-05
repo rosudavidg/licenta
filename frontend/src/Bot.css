@@ -30,6 +30,7 @@
   padding: 30px;
   text-align: center;
   margin-top: 40px;
+  z-index: 1;
 }
 
 .bot-message-text {
@@ -63,6 +64,35 @@
   flex-grow: 1;
   height: 100%;
   max-width: min(500px, 90%);
+  margin-bottom: 20px;
+}
+
+.bot-answer-drawing {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  -webkit-transition: 0.5s;
+  -webkit-appearance: none;
+  background-color: white;
+  transition: 0.5s;
+  outline: none;
+  background-color: #30323d;
+  border: none;
+  color: #cdd1c4;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  box-shadow: 1px 1px 10px rgb(100, 100, 100);
+  border-radius: 25px;
+  font-size: 20px;
+  width: 100%;
+  /* max-width: 500px; */
+  padding: 30px;
+  text-align: left;
+  margin-top: 40px;
+  flex-grow: 1;
+  height: 100%;
+  max-width: min(600px, 90%);
   margin-bottom: 20px;
 }
 

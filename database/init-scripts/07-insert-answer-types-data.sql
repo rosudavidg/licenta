@@ -14,3 +14,6 @@ INSERT INTO answer_types (name) VALUES ('date');
 
 -- Raspuns de tip score
 INSERT INTO answer_types (name) VALUES ('score');
+
+-- Raspuns de tip imagine
+INSERT INTO answer_types (name) VALUES ('image');

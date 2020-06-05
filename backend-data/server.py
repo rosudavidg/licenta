@@ -270,6 +270,31 @@ def get_dice(id):
     return response
 
 
+@app.route('/clock', methods=['POST'])
+def post_clock():
+    """
+    Adauga un desen cu un ceas
+    """
+
+    try:
+        buffer = request.get_json()['img']
+        path = request.args.get('path')
+
+        buffer_decoded = base64.b64decode(buffer[22:])
+
+        with open(path, 'wb') as out:
+            out.write(buffer_decoded)
+
+        # TODO: verifica daca ceasul e bun sau nu si adauga in baza de date raspunsul
+
+        return Response("Created", status=201, mimetype='application/json')
+
+    except Exception as e:
+        print(e)
+
+        return Response("Failed", status=500, mimetype='application/json')
+
+
 @app.route('/words', methods=['GET'])
 def words():
     """Verifica daca doua cuvinte sunt la fel (dar scrise gresit)"""

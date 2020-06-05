@@ -74,6 +74,9 @@ const create = async (userId) => {
   // Adauga intrebari de tip zaruri
   question_types.push("dices");
 
+  // Adauga intrebari de tip ceas
+  question_types.push("clock");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -181,6 +184,9 @@ const createByType = async (userId, type) => {
     case "dices":
       await createDices(userId);
       break;
+    case "clock":
+      await createClock(userId);
+      break;
   }
 };
 
@@ -191,6 +197,16 @@ const createTodayQuestion = async (userId) => {
     type,
     userId,
     "Ce zi a săptămânii este astăzi?",
+  ]);
+};
+
+const createClock = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'clock'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Desenează un ceas care indică ora 10:15!",
   ]);
 };
 
@@ -445,6 +461,17 @@ const getDice = async (diceId) => {
   return response.data;
 };
 
+const postClock = async (img, imgPath) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/clock?path=${imgPath}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.post(`http://${host}:${port}${path}`, { img: img });
+
+  return response.data;
+};
+
 const getTrafficSign = async (trafficSignId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -523,6 +550,10 @@ const getActiveQuestion = async (userId) => {
       break;
     case "today_date":
       question["type"] = "date";
+
+      break;
+    case "clock":
+      question["type"] = "clock";
 
       break;
     case "today":
@@ -928,6 +959,33 @@ const score = async (questionId, score) => {
   }
 };
 
+const answerClock = async (questionId, img, userId) => {
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_clock (question_id, path) VALUES ($1, $2)", [
+    questionId,
+    `/images/${userId}/clocks/${questionId}.png`,
+  ]);
+
+  postClock(img, `/images/${userId}/clocks/${questionId}.png`);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const image = async (questionId, img, userId) => {
+  const questionType = (
+    await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["type"];
+
+  switch (questionType) {
+    case "clock":
+      await answerClock(questionId, img, userId);
+      break;
+  }
+};
+
 module.exports = {
   activeQuestionExists,
   create,
@@ -939,4 +997,5 @@ module.exports = {
   answer,
   date,
   score,
+  image,
 };

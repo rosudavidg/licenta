@@ -71,3 +71,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'dices', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare ceas
+INSERT INTO question_types (name, answer_type)
+    SELECT 'clock', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'image';

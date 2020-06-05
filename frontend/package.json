@@ -16,6 +16,7 @@
     "konva": "^6.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-drawable-canvas": "^1.1.1",
     "react-facebook-login": "^4.1.1",
     "react-helmet": "^6.0.0",
     "react-icons": "^3.10.0",

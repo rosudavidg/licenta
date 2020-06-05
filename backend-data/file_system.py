@@ -53,6 +53,10 @@ def create_new_dir(data):
     user_path = '/images/' + user_id
     os.mkdir(user_path)
 
+    # Creeare director pentru imagini ceasuri
+    clock_path = 'images/' + user_id + '/clocks'
+    os.mkdir(clock_path)
+
 
 def save_posts_images(data):
     """

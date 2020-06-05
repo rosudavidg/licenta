@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { getProfilepic } from "./Auth.js";
 import { range } from "./Utils.js";
 import MemoryGame from "./MemoryGame.js";
+import Drawing from "./Drawing.js";
 
 import "./Bot.css";
 
@@ -244,16 +245,24 @@ const Bot = () => {
           )}
           <div className="bot-message-text">{question.message}</div>
         </div>
-        <div className="bot-answer">
-          <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
-          {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
-          {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
-          {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
-          {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}
-          {question.type === "memory_game" && (
-            <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
-          )}
-        </div>
+        {question.type !== "clock" && (
+          <div className="bot-answer">
+            <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+            {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
+            {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
+            {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
+            {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}
+            {question.type === "memory_game" && (
+              <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+            )}
+          </div>
+        )}
+        {question.type === "clock" && (
+          <div className="bot-answer-drawing">
+            <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+            <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+          </div>
+        )}
       </div>
     </>
   );

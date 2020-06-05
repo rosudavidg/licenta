@@ -542,3 +542,17 @@ CREATE TABLE IF NOT EXISTS answers_dices (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Raspunsurile utilizatorilor la intrebarile despre ceas
+CREATE TABLE IF NOT EXISTS answers_clock (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Calea absoluta la care se afla imaginea
+    path VARCHAR (128) NOT NULL,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

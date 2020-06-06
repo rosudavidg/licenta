@@ -49,7 +49,7 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
           throw new ServerError("Choice field is missing!", 400);
         }
 
-        await QuestionsService.choose(questionId, choice);
+        await QuestionsService.choose(questionId, choice, userId);
 
         break;
       case "text":

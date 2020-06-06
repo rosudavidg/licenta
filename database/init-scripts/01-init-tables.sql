@@ -604,3 +604,23 @@ CREATE TABLE IF NOT EXISTS answers_languages (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Intrebarile de tip genuri muzicale
+CREATE TABLE IF NOT EXISTS questions_music_genre (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul genului muzical
+    music_genre_id INTEGER REFERENCES music_genres(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre genuri muzicale
+CREATE TABLE IF NOT EXISTS answers_music_genre (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este afirmativ sau pozitiv
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

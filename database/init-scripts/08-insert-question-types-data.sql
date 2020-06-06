@@ -95,3 +95,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'language', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare despre genurile muzicale
+INSERT INTO question_types (name, answer_type)
+    SELECT 'music_genre', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare urmatoare pentru raspuns la genurile muzicale
+INSERT INTO question_types (name, answer_type)
+    SELECT 'music_genre_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'confirm';

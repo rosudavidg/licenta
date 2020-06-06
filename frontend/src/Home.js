@@ -33,12 +33,31 @@ const getReady = async (ready, setReady) => {
     });
 };
 
+const getStatsAvailability = async (setStatsAvailability) => {
+  const jwt_token = localStorage.getItem("token");
+
+  axios
+    .get("/stats/availability", {
+      headers: {
+        Authorization: `Bearer ${jwt_token}`,
+      },
+    })
+    .then(async (res) => {
+      setStatsAvailability(res.data);
+    })
+    .catch((e) => {
+      setStatsAvailability(false);
+    });
+};
+
 const Home = () => {
   const history = useHistory();
   const [ready, setReady] = useState(true);
+  const [statsAvailability, setStatsAvailability] = useState(true);
 
   useEffect(() => {
     getReady(ready, setReady);
+    getStatsAvailability(setStatsAvailability);
   }, []);
 
   const onClickBot = () => {
@@ -68,10 +87,28 @@ const Home = () => {
         <p>
           {ready && (
             <>
+              {!statsAvailability && (
+                <p>
+                  Statisticile vor deveni disponibile după prelucrarea unui număr minim de răspunsuri. Pentru mai multe
+                  detalii, consultă secțiunea:{" "}
+                  <span className="abount-link" onClick={() => history.push("/about")}>
+                    Despre
+                  </span>
+                  .
+                </p>
+              )}
               <div className="home-button" onClick={onClickBot}>
                 Antrenează-ți mintea!
               </div>
-              <div className="home-button"> Statistici</div>
+              {statsAvailability && <div className="home-button"> Statistici</div>}
+              {!statsAvailability && (
+                <>
+                  <div className="home-button deactivated" alt="hi">
+                    <FontAwesomeIcon icon={faLock} className="lock" />
+                    Statistici
+                  </div>
+                </>
+              )}
             </>
           )}
           {!ready && (

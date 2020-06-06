@@ -71,3 +71,9 @@
 .lock {
   margin-right: 10px;
 }
+
+.abount-link {
+  text-decoration: underline;
+  color: #cdd1c4;
+  cursor: pointer;
+}

@@ -95,7 +95,7 @@ const create = async (userId) => {
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "music_genre";
+
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
 };

@@ -75,19 +75,15 @@ const create = async (userId) => {
   question_types.push("dices");
 
   // Adauga intrebari de tip ceas
-  // TODO: maxim 1 odata pe zi
-  question_types.push("clock");
+  if (await canAskClock(userId)) question_types.push("clock");
 
   // Adauga intrebari de tip oras natal
-  // TODO: maxim 1 odata pe zi
-  question_types.push("hometown");
+  if (await canAskHometown(userId)) question_types.push("hometown");
 
   // Adauga intrebari de tip locatie
-  // TODO: maxim 1 odata pe zi
-  question_types.push("location");
+  if (await canAskLocation(userId)) question_types.push("location");
 
   // Adauga intrebari de tip limba
-  // TODO: maxim 1 odata pe zi
   question_types.push("language");
 
   // Adauga intrebari de tip genuri muzicale
@@ -108,6 +104,42 @@ const canAskToday = async (userId) => {
     (
       await query(
         "SELECT a.created_time::date, NOW()::date FROM answers_today a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskClock = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date, NOW()::date FROM answers_clock a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskHometown = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date, NOW()::date FROM answers_hometown a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        [userId]
+      )
+    ).length > 0;
+
+  return !res;
+};
+
+const canAskLocation = async (userId) => {
+  const res =
+    (
+      await query(
+        "SELECT a.created_time::date, NOW()::date FROM answers_location a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
         [userId]
       )
     ).length > 0;

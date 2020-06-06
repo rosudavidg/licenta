@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCookie, faHandshake } from "@fortawesome/free-solid-svg-icons";
 import "./Terms.css";
 
 const Terms = (props) => {
@@ -17,6 +19,9 @@ const Terms = (props) => {
   return (
     <div className="terms-container">
       <div className="terms-message">
+        <p className="cookie-icon">
+          <FontAwesomeIcon icon={faHandshake} size="3x" />
+        </p>
         <p>Salut!</p>
         <p>Bine ai venit pe Avatario!</p>
         <p>TODO: implement me</p>

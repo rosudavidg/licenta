@@ -93,6 +93,9 @@ const create = async (userId) => {
   // Adauga intrebari de tip genuri muzicale
   question_types.push("music_genre");
 
+  // Adauga intrebari despre tipurile de postari
+  question_types.push("post");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -214,6 +217,9 @@ const createByType = async (userId, type) => {
       break;
     case "music_genre":
       await createMusicGenre(userId);
+      break;
+    case "post":
+      await createPost(userId);
       break;
   }
 };
@@ -522,6 +528,42 @@ const createMusicGenre = async (userId) => {
   await query("INSERT INTO questions_music_genre (id, music_genre_id) VALUES ($1, $2)", [questionId, musicGenre]);
 };
 
+const createPost = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'post'"))[0]["id"];
+
+  const postTypes = await query("SELECT * FROM post_types");
+
+  // Alege un gen muzical random
+  const postType = postTypes[Math.floor(Math.random() * postTypes.length)]["id"];
+
+  const postTypeName = (await query("SELECT * FROM post_types WHERE id = $1", [postType]))[0]["name"];
+
+  let translatedPostTypeName = "";
+  switch (postTypeName) {
+    case "travelling":
+      translatedPostTypeName = "călătorie";
+      break;
+    case "sports":
+      translatedPostTypeName = "sport";
+      break;
+    case "technology":
+      translatedPostTypeName = "tehnologie";
+      break;
+  }
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Postezi despre ${translatedPostTypeName}?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_post (id, post_type) VALUES ($1, $2)", [questionId, postType]);
+};
+
 const createMusicGenreFollowUp = async (userId, questionId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'music_genre_follow_up'"))[0]["id"];
 
@@ -548,6 +590,34 @@ const createMusicGenreFollowUp = async (userId, questionId) => {
       type,
       userId,
       `În anul ${year} ai apreciat ${name}!`,
+    ]);
+  }
+};
+
+const createPostFollowUp = async (userId, questionId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'post_follow_up'"))[0]["id"];
+
+  // Extrage id-ul tipului de postare
+  const postTypeId = (await query("SELECT post_type FROM questions_post WHERE id = $1", [questionId]))[0]["post_type"];
+
+  // Extrage postarile din acest tip
+  const posts = await query("SELECT message, created_time::date FROM posts WHERE user_id = $1 AND post_type = $2", [
+    userId,
+    postTypeId,
+  ]);
+
+  if (posts.length != 0) {
+    // Alege o postare random
+    const post = posts[Math.floor(Math.random() * posts.length)];
+
+    const year = new Date(post["created_time"]).getFullYear();
+    const message = post["message"];
+
+    // Adauga intrebarea generica
+    await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+      type,
+      userId,
+      `În anul ${year} ai postat: "${message}".`,
     ]);
   }
 };
@@ -649,6 +719,9 @@ const getActiveQuestion = async (userId) => {
     case "music_genre_follow_up":
       question["type"] = "confirm";
       break;
+    case "post_follow_up":
+      question["type"] = "confirm";
+      break;
     case "animal":
       const animalId = (await query("SELECT animal_id FROM questions_animal WHERE id = $1", [questionId]))[0][
         "animal_id"
@@ -694,6 +767,10 @@ const getActiveQuestion = async (userId) => {
       question["choices"] = ["Da", "Nu"];
       break;
     case "music_genre":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
+    case "post":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
@@ -926,6 +1003,9 @@ const choose = async (questionId, choice, userId) => {
     case "music_genre":
       await answerMusicGenre(questionId, choice, userId);
       break;
+    case "post":
+      await answerPost(questionId, choice, userId);
+      break;
   }
 };
 
@@ -1100,6 +1180,22 @@ const answerMusicGenre = async (questionId, answer, userId) => {
 
     // Adauga intrebare follow-up
     await createMusicGenreFollowUp(userId, questionId);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerPost = async (questionId, answer, userId) => {
+  if (answer === "Da") {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_post (question_id, value) VALUES ($1, TRUE)", [questionId]);
+  } else {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_post (question_id, value) VALUES ($1, FALSE)", [questionId]);
+
+    // Adauga intrebare follow-up
+    await createPostFollowUp(userId, questionId);
   }
 
   // Marcheaza intrebarea drept raspunsa

@@ -107,3 +107,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'music_genre_follow_up', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'confirm';
+
+-- Intrebare despre postari
+INSERT INTO question_types (name, answer_type)
+    SELECT 'post', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare urmatoare pentru raspuns la postari
+INSERT INTO question_types (name, answer_type)
+    SELECT 'post_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'confirm';

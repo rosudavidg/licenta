@@ -624,3 +624,23 @@ CREATE TABLE IF NOT EXISTS answers_music_genre (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Intrebarile de tip postari
+CREATE TABLE IF NOT EXISTS questions_post (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul tipului de postare
+    post_type INTEGER REFERENCES post_types(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre postari
+CREATE TABLE IF NOT EXISTS answers_post (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este afirmativ sau pozitiv
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

@@ -556,3 +556,31 @@ CREATE TABLE IF NOT EXISTS answers_clock (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Raspunsurile utilizatorilor la intrebarile despre orasul curent
+CREATE TABLE IF NOT EXISTS answers_location (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre orasul natal
+CREATE TABLE IF NOT EXISTS answers_hometown (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

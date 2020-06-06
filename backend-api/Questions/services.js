@@ -75,7 +75,16 @@ const create = async (userId) => {
   question_types.push("dices");
 
   // Adauga intrebari de tip ceas
+  // TODO: maxim 1 odata pe zi
   question_types.push("clock");
+
+  // Adauga intrebari de tip oras natal
+  // TODO: maxim 1 odata pe zi
+  question_types.push("hometown");
+
+  // Adauga intrebari de tip locatie
+  // TODO: maxim 1 odata pe zi
+  question_types.push("location");
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
@@ -187,6 +196,12 @@ const createByType = async (userId, type) => {
     case "clock":
       await createClock(userId);
       break;
+    case "hometown":
+      await createHometown(userId);
+      break;
+    case "location":
+      await createLocation(userId);
+      break;
   }
 };
 
@@ -207,6 +222,26 @@ const createClock = async (userId) => {
     type,
     userId,
     "Desenează un ceas care indică ora 10:15!",
+  ]);
+};
+
+const createHometown = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'hometown'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Care este orașul tău natal?",
+  ]);
+};
+
+const createLocation = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'location'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Care este orașul în care locuiești acum?",
   ]);
 };
 
@@ -556,6 +591,12 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "clock";
 
       break;
+    case "hometown":
+      question["type"] = "text";
+      break;
+    case "location":
+      question["type"] = "text";
+      break;
     case "today":
       const days_of_the_week = await query("SELECT name FROM days_of_the_week");
       question["type"] = "choice";
@@ -897,7 +938,43 @@ const answerDices = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
-const answer = async (questionId, answer) => {
+const answerHometown = async (questionId, answer, userId) => {
+  // Extrage orasul natal
+  const realHometown = (await query("SELECT hometown FROM users WHERE id = $1", [userId]))[0]["hometown"];
+
+  const accuracy = await getAccuracy(realHometown, answer);
+  const correct = accuracy === 1;
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_hometown (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerLocation = async (questionId, answer, userId) => {
+  // Extrage orasul natal
+  const realLocation = (await query("SELECT location FROM users WHERE id = $1", [userId]))[0]["location"];
+
+  const accuracy = await getAccuracy(realLocation, answer);
+  const correct = accuracy === 1;
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_location (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answer = async (questionId, answer, userId) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
       questionId,
@@ -916,6 +993,12 @@ const answer = async (questionId, answer) => {
       break;
     case "dices":
       await answerDices(questionId, answer);
+      break;
+    case "hometown":
+      await answerHometown(questionId, answer, userId);
+      break;
+    case "location":
+      await answerLocation(questionId, answer, userId);
       break;
   }
 };

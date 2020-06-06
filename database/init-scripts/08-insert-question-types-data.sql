@@ -77,3 +77,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'clock', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'image';
+
+-- Intrebare te tip oras natal
+INSERT INTO question_types (name, answer_type)
+    SELECT 'hometown', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare te tip oras curent
+INSERT INTO question_types (name, answer_type)
+    SELECT 'location', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

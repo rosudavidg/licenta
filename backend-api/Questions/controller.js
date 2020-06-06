@@ -59,7 +59,7 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
           throw new ServerError("Answer field is missing!", 400);
         }
 
-        await QuestionsService.answer(questionId, answer);
+        await QuestionsService.answer(questionId, answer, userId);
 
         break;
       case "date":

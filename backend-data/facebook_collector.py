@@ -27,8 +27,7 @@ def collect_user_profile(graph):
     # Cerere Facebook API
     res = graph.get_object(
         'me',
-        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,favorite_teams,sports,hometown,languages,picture',
-        locale='en_GB'
+        fields='id,first_name,last_name,location,email,gender,birthday,favorite_athletes,favorite_teams,sports,hometown,languages,picture'
     )
 
     # Adaugare set de date
@@ -350,6 +349,7 @@ def facebook_collect(token):
     except:
         raise Exception('Something Bad Happened.')
 
+
 def facebook_prefetch(token):
     """
     Colecteaza profilul utilizatorului
@@ -368,6 +368,7 @@ def facebook_prefetch(token):
         return data
     except:
         raise Exception('Something Bad Happened.')
+
 
 def is_a_valid_facebook_profile(token, id):
     """

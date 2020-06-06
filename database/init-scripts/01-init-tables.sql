@@ -584,3 +584,23 @@ CREATE TABLE IF NOT EXISTS answers_hometown (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Intrebarile de tip limbi straine
+CREATE TABLE IF NOT EXISTS questions_language (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul limbii
+    language_id INTEGER REFERENCES languages(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre limbile straine
+CREATE TABLE IF NOT EXISTS answers_languages (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este afirmativ sau pozitiv
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

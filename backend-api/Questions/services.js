@@ -86,6 +86,10 @@ const create = async (userId) => {
   // TODO: maxim 1 odata pe zi
   question_types.push("location");
 
+  // Adauga intrebari de tip limba
+  // TODO: maxim 1 odata pe zi
+  question_types.push("language");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
 
@@ -201,6 +205,9 @@ const createByType = async (userId, type) => {
       break;
     case "location":
       await createLocation(userId);
+      break;
+    case "language":
+      await createLanguage(userId);
       break;
   }
 };
@@ -463,6 +470,29 @@ const createTrafficSign = async (userId) => {
   await query("INSERT INTO questions_traffic_sign (id, traffic_signs) VALUES ($1, $2)", [questionId, trafficSignId]);
 };
 
+const createLanguage = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'language'"))[0]["id"];
+
+  const languages = await query("SELECT * FROM languages WHERE user_id = $1", [userId]);
+
+  // Alege o limba random
+  const language = languages[Math.floor(Math.random() * languages.length)]["id"];
+
+  const languageName = (await query("SELECT * FROM languages WHERE id = $1", [language]))[0]["name"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Cunoști limba ${languageName}?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_language (id, language_id) VALUES ($1, $2)", [questionId, language]);
+};
+
 const getImage = async (faceId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -596,6 +626,10 @@ const getActiveQuestion = async (userId) => {
       break;
     case "location":
       question["type"] = "text";
+      break;
+    case "language":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
       break;
     case "today":
       const days_of_the_week = await query("SELECT name FROM days_of_the_week");
@@ -769,6 +803,16 @@ const answerDrivingLicence = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerLanguage = async (questionId, choice) => {
+  const value = choice === "Da";
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_languages (question_id, value) VALUES ($1, $2)", [questionId, value]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const choose = async (questionId, choice) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -799,6 +843,9 @@ const choose = async (questionId, choice) => {
       break;
     case "driving_licence":
       await answerDrivingLicence(questionId, choice);
+      break;
+    case "language":
+      await answerLanguage(questionId, choice);
       break;
     case "traffic_sign":
       const matchesNoTrafficSign = (await query("SELECT * FROM traffic_signs WHERE name = $1", [choice])).length;

@@ -89,3 +89,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'location', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare despre limbile straine cunoscute
+INSERT INTO question_types (name, answer_type)
+    SELECT 'language', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

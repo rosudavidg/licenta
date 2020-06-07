@@ -5,6 +5,7 @@ import { getProfilepic } from "./Auth.js";
 import { range } from "./Utils.js";
 import MemoryGame from "./MemoryGame.js";
 import Drawing from "./Drawing.js";
+import Loading from "./Loading.js";
 
 import "./Bot.css";
 
@@ -18,6 +19,7 @@ const Bot = () => {
 
   const getQuestion = async (setQuestion) => {
     const jwt_token = localStorage.getItem("token");
+    setQuestion("");
 
     axios
       .get("/questions", {
@@ -234,34 +236,44 @@ const Bot = () => {
   return (
     <>
       <div className="bot-container">
-        <div className="bot-message">
-          <img className="bot-message-icon" src="laptop.jpg" />
-          {question.image && <img className="bot-message-image" src={`data:image/png;base64,${question.image}`} />}
-          {question.images && (
-            <div className="bot-message-images-container">
-              <img className="bot-message-images" src={`data:image/png;base64,${question.images[0]}`} />
-              <img className="bot-message-images" src={`data:image/png;base64,${question.images[1]}`} />
-            </div>
-          )}
-          <div className="bot-message-text">{question.message}</div>
-        </div>
-        {question.type !== "clock" && (
-          <div className="bot-answer">
-            <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
-            {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
-            {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
-            {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
-            {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}
-            {question.type === "memory_game" && (
-              <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
-            )}
+        {question == "" && (
+          <div className="bot-message">
+            <Loading />
+            <div className="bot-message-text">Se încarcă...</div>
           </div>
         )}
-        {question.type === "clock" && (
-          <div className="bot-answer-drawing">
-            <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
-            <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
-          </div>
+        {question != "" && (
+          <>
+            <div className="bot-message">
+              <img className="bot-message-icon" src="logo.png" style={{ width: "50px", height: "50px" }} />
+              {question.image && <img className="bot-message-image" src={`data:image/png;base64,${question.image}`} />}
+              {question.images && (
+                <div className="bot-message-images-container">
+                  <img className="bot-message-images" src={`data:image/png;base64,${question.images[0]}`} />
+                  <img className="bot-message-images" src={`data:image/png;base64,${question.images[1]}`} />
+                </div>
+              )}
+              <div className="bot-message-text">{question.message}</div>
+            </div>
+            {question.type !== "clock" && (
+              <div className="bot-answer">
+                <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+                {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
+                {question.type === "choice" && <ChoiceComponent question={question} setQuestion={setQuestion} />}
+                {question.type === "text" && <TextComponent question={question} setQuestion={setQuestion} />}
+                {question.type === "confirm" && <ConfirmComponent question={question} setQuestion={setQuestion} />}
+                {question.type === "memory_game" && (
+                  <MemoryGame question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+                )}
+              </div>
+            )}
+            {question.type === "clock" && (
+              <div className="bot-answer-drawing">
+                <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+                <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+              </div>
+            )}
+          </>
         )}
       </div>
     </>

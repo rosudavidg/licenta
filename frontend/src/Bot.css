@@ -113,10 +113,13 @@
   box-sizing: border-box;
 }
 
-.bot-message-icon,
 .bot-answer-icon {
   width: 50px;
   border-radius: 50%;
+  margin: auto;
+}
+
+.bot-message-icon {
   margin: auto;
 }
 

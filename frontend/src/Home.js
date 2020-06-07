@@ -4,7 +4,7 @@ import { getFirstName } from "./Auth.js";
 import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
-
+import Loading from "./Loading.js";
 import "./Home.css";
 
 const sleep = (milliseconds) => {
@@ -114,7 +114,7 @@ const Home = () => {
           {!ready && (
             <>
               <p>Momentan, lucrăm la setările contului tău. Imediat ce vom termina, vei putea folosi aplicația!</p>
-
+              <Loading />
               <div className="home-button deactivated">
                 <FontAwesomeIcon icon={faLock} className="lock" />
                 Antrenează-ți mintea!

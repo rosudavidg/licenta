@@ -8,6 +8,7 @@ const Header = (props) => {
 
   return (
     <header>
+      <img className="header-logo" src="logo.png" style={{ width: "35px", height: "35px" }} />
       <div
         className="header-title"
         onClick={() => {

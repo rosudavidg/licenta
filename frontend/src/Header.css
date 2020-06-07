@@ -17,10 +17,14 @@ header {
 
 .header-title {
   display: flex;
-  margin-left: 20px;
   justify-content: center;
+  margin-left: 20px;
   text-shadow: 1px 1px #000000;
   cursor: pointer;
+}
+
+.header-logo {
+  margin-left: 60px;
 }
 
 .header-nav {

@@ -119,3 +119,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'post_follow_up', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'confirm';
+
+-- Intrebare despre carti
+INSERT INTO question_types (name, answer_type)
+    SELECT 'book', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare despre filme
+INSERT INTO question_types (name, answer_type)
+    SELECT 'movie', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

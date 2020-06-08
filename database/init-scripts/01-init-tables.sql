@@ -644,3 +644,43 @@ CREATE TABLE IF NOT EXISTS answers_post (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Intrebarile de tip carte
+CREATE TABLE IF NOT EXISTS questions_book (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul genului muzical
+    book_id INTEGER REFERENCES books(id)
+);
+
+-- Intrebarile de tip film
+CREATE TABLE IF NOT EXISTS questions_movie (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul genului muzical
+    movie_id INTEGER REFERENCES movies(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre carti
+CREATE TABLE IF NOT EXISTS answers_book (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este afirmativ sau pozitiv
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre filme
+CREATE TABLE IF NOT EXISTS answers_movie (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este afirmativ sau pozitiv
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);

@@ -89,6 +89,12 @@ const create = async (userId) => {
   // Adauga intrebari de tip genuri muzicale
   question_types.push("music_genre");
 
+  // Adauga intrebari de tip carte
+  if (await canAskBook(userId)) question_types.push("book");
+
+  // Adauga intrebari de tip film
+  if (await canAskMovie(userId)) question_types.push("movie");
+
   // Adauga intrebari despre tipurile de postari
   question_types.push("post");
 
@@ -111,11 +117,23 @@ const canAskToday = async (userId) => {
   return !res;
 };
 
+const canAskBook = async (userId) => {
+  const res = (await query("SELECT * FROM books WHERE user_id = $1", [userId])).length > 0;
+
+  return res;
+};
+
+const canAskMovie = async (userId) => {
+  const res = (await query("SELECT * FROM movies WHERE user_id = $1", [userId])).length > 0;
+
+  return res;
+};
+
 const canAskClock = async (userId) => {
   const res =
     (
       await query(
-        "SELECT a.created_time::date, NOW()::date FROM answers_clock a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        "SELECT a.created_time::date, NOW()::date FROM answers_clock a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date",
         [userId]
       )
     ).length > 0;
@@ -127,7 +145,7 @@ const canAskHometown = async (userId) => {
   const res =
     (
       await query(
-        "SELECT a.created_time::date, NOW()::date FROM answers_hometown a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        "SELECT a.created_time::date, NOW()::date FROM answers_hometown a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date",
         [userId]
       )
     ).length > 0;
@@ -139,7 +157,7 @@ const canAskLocation = async (userId) => {
   const res =
     (
       await query(
-        "SELECT a.created_time::date, NOW()::date FROM answers_location a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date AND a.correct = TRUE",
+        "SELECT a.created_time::date, NOW()::date FROM answers_location a JOIN questions q ON a.id = q.id WHERE q.user_id = $1 AND a.created_time::date = NOW()::date",
         [userId]
       )
     ).length > 0;
@@ -252,6 +270,12 @@ const createByType = async (userId, type) => {
       break;
     case "post":
       await createPost(userId);
+      break;
+    case "book":
+      await createBook(userId);
+      break;
+    case "movie":
+      await createMovie(userId);
       break;
   }
 };
@@ -560,6 +584,52 @@ const createMusicGenre = async (userId) => {
   await query("INSERT INTO questions_music_genre (id, music_genre_id) VALUES ($1, $2)", [questionId, musicGenre]);
 };
 
+const createBook = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'book'"))[0]["id"];
+
+  const books = await query("SELECT * FROM books WHERE user_id = $1", [userId]);
+
+  // Alege o carte random
+  const book = books[Math.floor(Math.random() * books.length)]["id"];
+
+  const bookName = (await query("SELECT * FROM books WHERE id = $1", [book]))[0]["name"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ai citit cartea "${bookName}"?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_book (id, book_id) VALUES ($1, $2)", [questionId, book]);
+};
+
+const createMovie = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'movie'"))[0]["id"];
+
+  const movies = await query("SELECT * FROM movies WHERE user_id = $1", [userId]);
+
+  // Alege un film random
+  const movie = movies[Math.floor(Math.random() * movies.length)]["id"];
+
+  const movieName = (await query("SELECT * FROM movies WHERE id = $1", [movie]))[0]["name"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ai văzut "${movieName}"?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_movie (id, movie_id) VALUES ($1, $2)", [questionId, movie]);
+};
+
 const createPost = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'post'"))[0]["id"];
 
@@ -802,6 +872,14 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
+    case "book":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
+    case "movie":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
     case "post":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
@@ -1035,6 +1113,12 @@ const choose = async (questionId, choice, userId) => {
     case "music_genre":
       await answerMusicGenre(questionId, choice, userId);
       break;
+    case "book":
+      await answerBook(questionId, choice);
+      break;
+    case "movie":
+      await answerMovie(questionId, choice);
+      break;
     case "post":
       await answerPost(questionId, choice, userId);
       break;
@@ -1213,6 +1297,20 @@ const answerMusicGenre = async (questionId, answer, userId) => {
     // Adauga intrebare follow-up
     await createMusicGenreFollowUp(userId, questionId);
   }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerBook = async (questionId, answer) => {
+  await query("INSERT INTO answers_book (question_id, value) VALUES ($1, $2)", [questionId, answer === "Da"]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerMovie = async (questionId, answer) => {
+  await query("INSERT INTO answers_movie (question_id, value) VALUES ($1, $2)", [questionId, answer === "Da"]);
 
   // Marcheaza intrebarea drept raspunsa
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);

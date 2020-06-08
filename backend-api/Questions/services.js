@@ -790,6 +790,17 @@ const getAccuracy = async (target, guessed) => {
   return response.data;
 };
 
+const getMatchingTag = async (tags, word) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = encodeURI(`/matching_tag?tags=${tags}&word=${word}`);
+
+  // Cerere catre backend-data pentru a verifica existenta unei potriviri
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getActiveQuestion = async (userId) => {
   const question = (
     await query(
@@ -1197,17 +1208,17 @@ const answerAnimal = async (questionId, answer) => {
   // Parseaza cuvantul
   const name = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0)[0];
 
-  // Extrag numele animalului
-  const realName = (
+  // Extrag tag-urile animalului
+  const tags = (
     await query(
-      "SELECT at.name FROM questions_animal q JOIN animals a ON q.animal_id = a.id JOIN animal_types at ON a.animal_type = at.id WHERE q.id = $1",
+      "SELECT at.tags FROM questions_animal q JOIN animals a ON q.animal_id = a.id JOIN animal_types at ON a.animal_type = at.id WHERE q.id = $1",
       [questionId]
     )
-  )[0]["name"];
+  )[0]["tags"];
 
-  // Calculez precizia raspunsului
-  const accuracy = await getAccuracy(realName, name);
-  const correct = accuracy === 1;
+  // Verific daca exista potrivire
+  const matchingTag = await getMatchingTag(tags, name);
+  const correct = matchingTag === "True";
 
   // Adaug raspunsul
   await query("INSERT INTO answers_animal (question_id, name, correct) VALUES ($1, $2, $3)", [

@@ -474,7 +474,9 @@ CREATE TABLE IF NOT EXISTS animal_types (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Numele animalului
-    name VARCHAR (64)
+    name VARCHAR (64),
+    -- Simonime sau cuvinte asemanatoare
+    tags TEXT
 );
 
 -- Pozele cu animale

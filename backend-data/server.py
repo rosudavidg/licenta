@@ -345,5 +345,31 @@ def common_words_accuracy():
         return Response("False", status=200, mimetype='application/json')
 
 
+@app.route('/matching_tag', methods=['GET'])
+def matching_tag():
+    """Verifica daca un cuvant se afla intr-o alta lista de cuvinte"""
+
+    try:
+        # Extrag cuvintele din cerere
+        tags = request.args.get('tags')
+        word = request.args.get('word')
+
+        if tags == None or word == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        # Extrag tag-urile
+        tags_words = tags.split(",")
+
+        # Calculez potrivirile
+        same_words = [same_word(tag, word) for tag in tags_words]
+
+        if (any(same_words)):
+            return Response("True", status=200, mimetype='application/json')
+
+        return Response("False", status=200, mimetype='application/json')
+    except:
+        return Response("False", status=200, mimetype='application/json')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

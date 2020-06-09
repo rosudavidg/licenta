@@ -526,3 +526,18 @@ def get_first_name(connection, id):
     except:
         connection.rollback()
         return None
+
+
+def set_correct_clock(connection, path, correct):
+    cursor = connection.cursor()
+
+    sql = ("UPDATE answers_clock SET correct = %s WHERE path = %s")
+    val = (correct, path)
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

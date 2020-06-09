@@ -1,6 +1,7 @@
 from facebook_collector import facebook_collect, is_a_valid_facebook_profile, facebook_prefetch
 from file_system import save_posts_images, save_albums_photos, save_profile_picture, create_new_dir
 from face_api import get_persons
+from clock_api import is_correct_clock
 from flask import Flask, request, Response, make_response, send_file
 from utils import get_all_image_paths, get_all_images, same_word
 from threading import Lock
@@ -285,7 +286,9 @@ def post_clock():
         with open(path, 'wb') as out:
             out.write(buffer_decoded)
 
-        # TODO: verifica daca ceasul e bun sau nu si adauga in baza de date raspunsul
+        # Verifica daca ceasul este corect sau nu si actualizeaza baza de date
+        correct = is_correct_clock(path)
+        database.set_correct_clock(db_connection, path, correct)
 
         return Response("Created", status=201, mimetype='application/json')
 

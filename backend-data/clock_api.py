@@ -109,6 +109,7 @@ def is_correct_clock(filename):
 
     # Calcularea numarului de cifre corecte
     for hour in range(1, 13):
+        # TODO: inverseaza cele doua for-uri (urmatoare)
         for c in regs_contours[hour]:
             x, y, w, h = cv2.boundingRect(c)
             digit = thresh[y:y+h, x:x+w]

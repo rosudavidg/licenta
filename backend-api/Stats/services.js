@@ -14,7 +14,6 @@ const getMatchingTag = async (tags, word) => {
 };
 
 const hasEnoughNewAnswers = async (userId, lastDate) => {
-  return true;
   // Verificare intrebari common words
   const common_words_count = (
     await query(

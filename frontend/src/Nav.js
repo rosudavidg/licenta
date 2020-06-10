@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { getProfilepic } from "./Auth.js";
-import "./Nav.css";
+import "./Nav.scss";
 
 const Nav = (props) => {
   const history = useHistory();

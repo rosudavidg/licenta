@@ -1,3 +1,5 @@
+@import "./global.scss";
+
 .about-container {
   display: flex;
   flex-direction: column;
@@ -15,7 +17,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;

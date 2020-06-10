@@ -14,6 +14,7 @@
     "helmet": "^3.22.0",
     "jwt-decode": "^2.2.0",
     "konva": "^6.0.0",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-drawable-canvas": "^1.1.1",

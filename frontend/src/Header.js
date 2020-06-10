@@ -1,7 +1,7 @@
 import React from "react";
 import Nav from "./Nav.js";
 import { useHistory } from "react-router-dom";
-import "./Header.css";
+import "./Header.scss";
 
 const Header = (props) => {
   const history = useHistory();

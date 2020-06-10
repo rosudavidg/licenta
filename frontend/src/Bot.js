@@ -7,7 +7,7 @@ import MemoryGame from "./MemoryGame.js";
 import Drawing from "./Drawing.js";
 import Loading from "./Loading.js";
 
-import "./Bot.css";
+import "./Bot.scss";
 
 const Bot = () => {
   const [question, setQuestion] = useState("");

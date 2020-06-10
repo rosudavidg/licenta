@@ -1,3 +1,5 @@
+@import "./global.scss";
+
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -15,7 +17,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;
@@ -25,8 +27,8 @@
   box-shadow: 1px 1px 10px rgb(100, 100, 100);
   border-radius: 25px;
   font-size: 20px;
-  width: 100%;
-  max-width: min(300px, 90%);
+  width: 300px;
+  max-width: calc(90%);
   padding: 10px;
   text-align: center;
   margin-top: 40px;
@@ -42,7 +44,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;
@@ -68,7 +70,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #ffffff;
   font-weight: 600;
@@ -96,7 +98,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;
@@ -106,8 +108,8 @@
   box-shadow: 1px 1px 10px rgb(100, 100, 100);
   border-radius: 25px;
   font-size: 20px;
-  width: 100%;
-  max-width: min(500px, 90%);
+  width: 500px;
+  max-width: calc(90%);
   padding: 10px;
   text-align: center;
   margin-top: 40px;
@@ -132,7 +134,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;
@@ -142,8 +144,8 @@
   box-shadow: 1px 1px 10px rgb(100, 100, 100);
   border-radius: 25px;
   font-size: 20px;
-  width: 100%;
-  max-width: min(500px, 90%);
+  width: 500px;
+  max-width: calc(90%);
   padding: 30px;
   text-align: left;
   margin-top: 40px;

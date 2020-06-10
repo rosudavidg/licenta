@@ -1,9 +1,9 @@
 import React from "react";
-import "./Footer.css";
+import "./Footer.scss";
 import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
-import { faEnvelope, faCookie } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faCookie, faCookieBite } from "@fortawesome/free-solid-svg-icons";
 
 const FooterFacebook = () => {
   return (
@@ -30,7 +30,7 @@ const FooterEmail = () => {
 const TermsLink = (props) => {
   return (
     <div className="footer-terms f-terms" onClick={() => props.history.push("/terms")}>
-      <FontAwesomeIcon icon={faCookie} />
+      <FontAwesomeIcon icon={faCookieBite} />
       <div className="footer-facebook-email">Termeni și condiții</div>
     </div>
   );

@@ -1,5 +1,7 @@
+@import "./global.scss";
+
 header {
-  background-color: #30323d;
+  background-color: $backgroundColor;
   color: #cdd1c4;
   font-size: 24px;
   font-weight: 800;

@@ -14,6 +14,7 @@ import { isUserAuthenticated } from "./Auth.js";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import "./App.css";
+import "./global.scss";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(isUserAuthenticated());

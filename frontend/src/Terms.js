@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCookie, faHandshake } from "@fortawesome/free-solid-svg-icons";
-import "./Terms.css";
+import { faHandshake } from "@fortawesome/free-solid-svg-icons";
+import "./Terms.scss";
 
 const Terms = (props) => {
   const history = useHistory();

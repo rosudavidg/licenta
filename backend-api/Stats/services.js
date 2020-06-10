@@ -2,10 +2,18 @@ const query = require("../database");
 const { ServerError } = require("../errors");
 const axios = require("axios");
 
-const hasEnoughNewAnswers = async (userId, lastDate) => {
-  // TODO: remove next line
-  return true;
+const getMatchingTag = async (tags, word) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = encodeURI(`/matching_tag?tags=${tags}&word=${word}`);
 
+  // Cerere catre backend-data pentru a verifica existenta unei potriviri
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
+const hasEnoughNewAnswers = async (userId, lastDate) => {
   // Verificare intrebari common words
   const common_words_count = (
     await query(
@@ -17,15 +25,22 @@ const hasEnoughNewAnswers = async (userId, lastDate) => {
   if (common_words_count < 3) return false;
 
   // Verificare intrebari recunoastere persoane
-  // TODO: verifica daca exista cel putin 1 fata
-  const face_count = (
-    await query(
-      "SELECT f.person_id FROM questions q JOIN questions_face qf ON q.id = qf.id JOIN faces f ON qf.face_id = f.id  WHERE q.created_time > $1 AND q.user_id = $2 GROUP BY f.person_id HAVING count(*) >= 3",
-      [lastDate, userId]
-    )
-  ).length;
+  const face = (
+    await query("SELECT COUNT(*) as count FROM faces f JOIN images i ON f.image_id = i.id WHERE i.user_id = $1", [
+      userId,
+    ])
+  )[0]["count"];
 
-  if (face_count < 3) return false;
+  if (face > 0) {
+    const face_count = (
+      await query(
+        "SELECT f.person_id FROM questions q JOIN questions_face qf ON q.id = qf.id JOIN faces f ON qf.face_id = f.id  WHERE q.created_time > $1 AND q.user_id = $2 GROUP BY f.person_id HAVING count(*) >= 3",
+        [lastDate, userId]
+      )
+    ).length;
+
+    if (face_count < 3) return false;
+  }
 
   // Verificare intrebari anotimp
   const season_count = (
@@ -784,10 +799,84 @@ const computeCommonWordsAcc = async (userId, startDate) => {
   return sum / count;
 };
 
+const computeFaceAcc = async (userId, startDate) => {
+  // Extrage toate raspunsurile valide
+  const faces = await query(
+    "SELECT * FROM answers_face a JOIN questions q ON a.question_id = q.id JOIN questions_face qf ON qf.id = q.id JOIN faces f ON f.id = qf.face_id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND lower(a.name) NOT IN ('eu', 'sunt eu', 'eu sunt')",
+    [userId, startDate]
+  );
+
+  if (faces.length == 0) return undefined;
+
+  // Impartire dupa persoane
+  const persons = {};
+
+  for (let i = 0; i < faces.length; i++) {
+    if (faces[i]["name"] != "")
+      if (faces[i]["person_id"] in persons) {
+        persons[faces[i]["person_id"]].push(faces[i]["name"]);
+      } else {
+        persons[faces[i]["person_id"]] = [faces[i]["name"]];
+      }
+  }
+
+  // Calculare precizie
+  let sum = 0;
+  let count = 0;
+
+  // Pentru fiecare persoana se calculeaza precizia de recunoastere
+  for (let person in persons) {
+    // Lista de nume gasite
+    const nameLists = [];
+
+    // Pentru fiecare nume, il adaug in lista de nume gasite
+    for (let i = 0; i < persons[person].length; i++) {
+      const currentName = persons[person][i];
+
+      // Verific daca poate fi adaugat intr-o lista deja existenta
+      let done = false;
+
+      for (let j = 0; j < nameLists.length; j++) {
+        const list = nameLists[j];
+
+        if (done) break;
+
+        if ((await getMatchingTag(list.join(","), currentName)) == "True") {
+          // Cuvantul este adaugat in lista
+          list.push(currentName);
+          done = true;
+        }
+      }
+
+      if (!done) {
+        // Se construieste o lista noua cu numele curent
+        nameLists.push([currentName]);
+      }
+    }
+
+    // Se calculeaza numarul maxim de elemente din liste
+    const maxElements = Math.max(...nameLists.map((e) => e.length));
+
+    // Calculare precizie persoana curenta
+    const acc = maxElements / persons[person].length;
+    sum += acc;
+    count++;
+  }
+
+  // Adauga persoanele care au doar campuri vide
+  for (let i = 0; i < faces.length; i++) {
+    if (!(faces[i]["person_id"] in persons)) {
+      count++;
+    }
+  }
+
+  //   Calculare precizie totala
+  return sum / count;
+};
+
 const createStats = async (userId, statsId, startDate) => {
   const accCommonWords = await computeCommonWordsAcc(userId, startDate);
-  // TODO: face acc
-  const accFace = undefined;
+  const accFace = await computeFaceAcc(userId, startDate);
   const accSeason = await computeSeasonAcc(userId, startDate);
   const accToday = await computeTodayAcc(userId, startDate);
   const accTrafficSign = await computeTrafficSignAcc(userId, startDate);

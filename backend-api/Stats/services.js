@@ -1018,7 +1018,14 @@ const createStatsEntry = async (userId) => {
   createStats(userId, statsId, startDate);
 };
 
+const availableStats = async (userId) => {
+  const noStats = (await query("SELECT COUNT(*) FROM stats WHERE user_id = $1 AND ready = TRUE", [userId]))[0]["count"];
+
+  return noStats > 0;
+};
+
 module.exports = {
   canCreateStats,
   createStatsEntry,
+  availableStats,
 };

@@ -12,9 +12,7 @@ router.get("/availability", authorizeAndExtractToken, accountIsReady, async (req
   const { userId } = req.state.decoded;
 
   try {
-    // TODO: implement me
-
-    res.status(200).json(false);
+    res.status(200).json(await StatsService.availableStats(userId));
   } catch (err) {
     next(err);
   }

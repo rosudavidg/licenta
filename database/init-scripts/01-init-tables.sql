@@ -691,6 +691,8 @@ CREATE TABLE IF NOT EXISTS answers_movie (
 CREATE TABLE IF NOT EXISTS stats (
     -- Id
     id SERIAL PRIMARY KEY,
+    -- Preciziile au fost sau nu calculate inca
+    ready BOOLEAN DEFAULT FALSE,
     -- Id al utilizatorului
     user_id BIGINT REFERENCES users(id),
     -- Data de inceput

@@ -14,6 +14,7 @@ const getMatchingTag = async (tags, word) => {
 };
 
 const hasEnoughNewAnswers = async (userId, lastDate) => {
+  return true;
   // Verificare intrebari common words
   const common_words_count = (
     await query(
@@ -937,7 +938,7 @@ const createStats = async (userId, statsId, startDate) => {
 
   // Actualizeaza rezultatele in baza de date
   await query(
-    "UPDATE stats SET acc_total = $1, acc_short_term_memory = $2, acc_long_term_memory = $3, acc_common_words = $4, acc_face = $5, acc_season = $6, acc_today = $7,  acc_traffic_sign = $8, acc_birthday = $9, acc_today_date = $10, acc_animals = $11, acc_memory_game = $12, acc_dices = $13, acc_clock = $14, acc_hometown = $15, acc_location = $16, acc_language = $17, acc_music_genre = $18, acc_post = $19, acc_book = $20, acc_movie = $21 WHERE id = $22",
+    "UPDATE stats SET ready = TRUE, acc_total = $1, acc_short_term_memory = $2, acc_long_term_memory = $3, acc_common_words = $4, acc_face = $5, acc_season = $6, acc_today = $7,  acc_traffic_sign = $8, acc_birthday = $9, acc_today_date = $10, acc_animals = $11, acc_memory_game = $12, acc_dices = $13, acc_clock = $14, acc_hometown = $15, acc_location = $16, acc_language = $17, acc_music_genre = $18, acc_post = $19, acc_book = $20, acc_movie = $21 WHERE id = $22",
     [
       accTotal,
       accShortTermMemory,

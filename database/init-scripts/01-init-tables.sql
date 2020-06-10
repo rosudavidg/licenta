@@ -686,3 +686,57 @@ CREATE TABLE IF NOT EXISTS answers_movie (
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );
+
+-- Statisticile utilizatorului
+CREATE TABLE IF NOT EXISTS stats (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Id al utilizatorului
+    user_id BIGINT REFERENCES users(id),
+    -- Data de inceput
+    start_date DATE NOT NULL,
+    -- Data de sfarsit
+    end_date DATE NOT NULL,
+    -- Acuratetea totala
+    acc_total FLOAT,
+    -- Acuratetea pentru memoria de scurta durata
+    acc_short_term_memory FLOAT,
+    -- Acuratetea pentru memoria de lunga durata
+    acc_long_term_memory FLOAT,
+    -- Acuratete - common words
+    acc_common_words FLOAT,
+    -- Acuratete - recunoastere persoane in imagini
+    acc_face FLOAT,
+    -- Acuratete - anotimp
+    acc_season FLOAT,
+    -- Acuratete - ziua din saptamana
+    acc_today FLOAT,
+    -- Acuratete - indicatoare rutiere
+    acc_traffic_sign FLOAT,
+    -- Acuratete - zi de nastere
+    acc_birthday FLOAT,
+    -- Acuratete - data de astazi
+    acc_today_date FLOAT,
+    -- Acuratete - recunoastere animale in imagini
+    acc_animals FLOAT,
+    -- Acuratete - joc de memorie
+    acc_memory_game FLOAT,
+    -- Acuratete - zaruri
+    acc_dices FLOAT,
+    -- Acuratete - desenare ceas
+    acc_clock FLOAT,
+    -- Acuratete - oras natal
+    acc_hometown FLOAT,
+    -- Acuratete - locatia curenta
+    acc_location FLOAT,
+    -- Acuratete - limbi
+    acc_language FLOAT,
+    -- Acuratete - genuri muzicale
+    acc_music_genre FLOAT,
+    -- Acuratete - postari
+    acc_post FLOAT,
+    -- Acuratete - carti
+    acc_book FLOAT,
+    -- Acuratete - filme
+    acc_movie FLOAT
+);

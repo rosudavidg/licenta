@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const QuestionsService = require("./services.js");
+const StatsService = require("../Stats/services.js");
+
 const { authorizeAndExtractToken } = require("../security/JWT/index.js");
 const { accountIsReady } = require("../middlewares/index.js");
 const { ServerError } = require("../errors");
@@ -89,6 +91,11 @@ router.post("/:id/answer", authorizeAndExtractToken, accountIsReady, async (req,
 
         await QuestionsService.image(questionId, image, userId);
         break;
+    }
+
+    // Se incearca adaugarea de statistici
+    if (await StatsService.canCreateStats(userId)) {
+      await StatsService.createStatsEntry(userId);
     }
 
     res.sendStatus(201);

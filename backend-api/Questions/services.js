@@ -84,9 +84,11 @@ const create = async (userId) => {
   if (await canAskLocation(userId)) question_types.push("location");
 
   // Adauga intrebari de tip limba
+  // TODO: verifica daca exista cel putin o limba
   question_types.push("language");
 
   // Adauga intrebari de tip genuri muzicale
+  // TODO: verifica daca exista cel putin un gen muzical
   question_types.push("music_genre");
 
   // Adauga intrebari de tip carte
@@ -96,11 +98,12 @@ const create = async (userId) => {
   if (await canAskMovie(userId)) question_types.push("movie");
 
   // Adauga intrebari despre tipurile de postari
+  // TODO: verifica daca exista cel putin o postare
   question_types.push("post");
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-
+  // question_type = "birthday";
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
 };
@@ -150,6 +153,8 @@ const canAskHometown = async (userId) => {
       )
     ).length > 0;
 
+  // TODO: verifica daca exista hometown in date
+
   return !res;
 };
 
@@ -161,6 +166,8 @@ const canAskLocation = async (userId) => {
         [userId]
       )
     ).length > 0;
+
+  // TODO: verifica daca exista location in date
 
   return !res;
 };

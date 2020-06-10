@@ -1024,8 +1024,19 @@ const availableStats = async (userId) => {
   return noStats > 0;
 };
 
+const getStats = async (userId) => {
+  const stats = await query("SELECT * FROM stats WHERE user_id = $1 AND ready = TRUE", [userId]);
+
+  if (stats.length == 0) {
+    throw new ServerError("Cannot find stats.", 400);
+  }
+
+  return stats;
+};
+
 module.exports = {
   canCreateStats,
   createStatsEntry,
   availableStats,
+  getStats,
 };

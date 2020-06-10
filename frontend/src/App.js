@@ -7,6 +7,7 @@ import Bot from "./Bot";
 import Home from "./Home";
 import About from "./About";
 import Terms from "./Terms";
+import Stats from "./Stats";
 import { Helmet } from "react-helmet";
 
 import { isUserAuthenticated } from "./Auth.js";
@@ -52,6 +53,13 @@ function App() {
                   path="/terms"
                   render={() => {
                     return <Terms />;
+                  }}
+                />
+                <Route
+                  exact
+                  path="/stats"
+                  render={() => {
+                    return <Stats />;
                   }}
                 />
                 <Route

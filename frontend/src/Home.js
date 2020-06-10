@@ -100,7 +100,12 @@ const Home = () => {
               <div className="home-button" onClick={onClickBot}>
                 Antrenează-ți mintea!
               </div>
-              {statsAvailability && <div className="home-button"> Statistici</div>}
+              {statsAvailability && (
+                <div className="home-button" onClick={() => history.push("/stats")}>
+                  {" "}
+                  Statistici
+                </div>
+              )}
               {!statsAvailability && (
                 <>
                   <div className="home-button deactivated" alt="hi">

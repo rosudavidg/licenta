@@ -143,11 +143,57 @@
   box-shadow: 1px 1px 10px rgb(100, 100, 100);
   border-radius: 25px;
   font-size: 20px;
-  width: 500px;
-  max-width: calc(90%);
+  // width: 500px;
+  // max-width: calc(90%);
+  width: 90%;
   padding: 30px;
   text-align: left;
   margin-top: 40px;
+}
+
+.stats-periodic-stats-total {
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  -webkit-transition: 0.5s;
+  -webkit-appearance: none;
+  background-color: white;
+  transition: 0.5s;
+  outline: none;
+  background-color: $backgroundColor;
+  border: none;
+  color: #cdd1c4;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 2px;
+  text-decoration: none;
+  box-shadow: 1px 1px 10px rgb(100, 100, 100);
+  border-radius: 25px;
+  font-size: 20px;
+  // width: 500px;
+  width: 90%;
+  padding: 30px;
+  text-align: left;
+  margin-top: 40px;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  // margin: auto;
+}
+
+.stats-periodic-stats-pie {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 0;
+  flex-wrap: wrap;
+  flex-direction: column;
+  // margin: auto;
+  // width: 100%;
+  // flex-wrap: 0;
+}
+
+.stats-periodic-stats-pie-text {
+  margin: auto;
+  margin-top: 20px;
 }
 
 .stats-periodic-button-left {
@@ -156,4 +202,8 @@
 
 .stats-periodic-button-right {
   margin-right: 20px;
+}
+
+.stats-periodic-stats-text {
+  margin-bottom: 30px;
 }

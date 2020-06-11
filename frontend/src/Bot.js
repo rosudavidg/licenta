@@ -23,7 +23,7 @@ const Bot = () => {
     setQuestion("");
 
     axios
-      .get("/questions", {
+      .get(`${process.env.REACT_APP_API_URL}/questions`, {
         headers: {
           Authorization: `Bearer ${jwt_token}`,
         },
@@ -41,7 +41,7 @@ const Bot = () => {
     const jwt_token = localStorage.getItem("token");
     await axios
       .post(
-        `/questions/${question.id}/answer`,
+        `${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`,
         { choice: choice },
         {
           headers: {
@@ -60,7 +60,7 @@ const Bot = () => {
   const answerConfirmQuestion = async (question, setQuestion) => {
     const jwt_token = localStorage.getItem("token");
     await axios
-      .post(`/questions/${question.id}/answer`, "", {
+      .post(`${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`, "", {
         headers: {
           Authorization: `Bearer ${jwt_token}`,
         },
@@ -77,7 +77,7 @@ const Bot = () => {
     const jwt_token = localStorage.getItem("token");
     await axios
       .post(
-        `/questions/${question.id}/answer`,
+        `${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`,
         { answer: answer },
         {
           headers: {
@@ -98,7 +98,7 @@ const Bot = () => {
     const jwt_token = localStorage.getItem("token");
     await axios
       .post(
-        `/questions/${question.id}/answer`,
+        `${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`,
         { date: date },
         {
           headers: {

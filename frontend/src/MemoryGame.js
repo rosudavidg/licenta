@@ -26,7 +26,7 @@ const MemoryGame = (props) => {
     const jwt_token = localStorage.getItem("token");
     await axios
       .post(
-        `/questions/${question.id}/answer`,
+        `${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`,
         { score: score },
         {
           headers: {

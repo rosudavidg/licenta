@@ -12,7 +12,7 @@ const Drawing = (props) => {
 
     await axios
       .post(
-        `/questions/${question.id}/answer`,
+        `${process.env.REACT_APP_API_URL}/questions/${question.id}/answer`,
         { image: window.canvas.toDataURL() },
         {
           headers: {

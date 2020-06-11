@@ -9,8 +9,9 @@ const Facebook = (props) => {
   const history = useHistory();
 
   const loginCallback = (response) => {
+    console.log(`${process.env.REACT_APP_API_URL}`);
     axios
-      .post("/users/login", {
+      .post(`${process.env.REACT_APP_API_URL}/users/login`, {
         userId: response.id,
         token: response.accessToken,
       })

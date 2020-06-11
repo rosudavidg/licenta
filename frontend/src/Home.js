@@ -16,7 +16,7 @@ const getReady = async (ready, setReady) => {
   const jwt_token = localStorage.getItem("token");
 
   axios
-    .get("/users/ready", {
+    .get(`${process.env.REACT_APP_API_URL}/users/ready`, {
       headers: {
         Authorization: `Bearer ${jwt_token}`,
       },
@@ -38,7 +38,7 @@ const getStatsAvailability = async (setStatsAvailability) => {
   const jwt_token = localStorage.getItem("token");
 
   axios
-    .get("/stats/availability", {
+    .get(`${process.env.REACT_APP_API_URL}/stats/availability`, {
       headers: {
         Authorization: `Bearer ${jwt_token}`,
       },

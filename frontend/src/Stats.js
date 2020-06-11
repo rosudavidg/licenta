@@ -78,14 +78,14 @@ const Periodic = (props) => {
   return (
     <>
       <div className="stats-periodic-top">
-        <div className="stats-periodic-button" onClick={onClickPrev}>
+        <div className="stats-periodic-button stats-periodic-button-left" onClick={onClickPrev}>
           <FontAwesomeIcon icon={faArrowCircleLeft} />
         </div>
         <div className="stats-periodic-top-dates">
           {new Date(stats[index]["start_date"]).toLocaleDateString("ro", { timezone: "UTC" })} -{" "}
           {new Date(stats[index]["end_date"]).toLocaleDateString("ro", { timezone: "UTC" })}
         </div>
-        <div className="stats-periodic-button" onClick={onClickNext}>
+        <div className="stats-periodic-button stats-periodic-button-right" onClick={onClickNext}>
           <FontAwesomeIcon icon={faArrowCircleRight} />
         </div>
       </div>

@@ -117,8 +117,7 @@
 }
 
 .stats-periodic-top-dates {
-  margin-right: 20px;
-  margin-left: 20px;
+  flex-grow: 1;
 }
 
 .stats-periodic-button {
@@ -149,4 +148,12 @@
   padding: 30px;
   text-align: left;
   margin-top: 40px;
+}
+
+.stats-periodic-button-left {
+  margin-left: 20px;
+}
+
+.stats-periodic-button-right {
+  margin-right: 20px;
 }

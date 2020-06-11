@@ -78,7 +78,7 @@
   background-color: white;
   transition: 0.5s;
   outline: none;
-  background-color: #30323d;
+  background-color: $backgroundColor;
   border: none;
   color: #cdd1c4;
   font-weight: 600;
@@ -94,7 +94,8 @@
   margin-top: 40px;
   flex-grow: 1;
   height: 100%;
-  // max-width: min(600px, 90%);
+  width: 600px;
+  max-width: calc(90%);
   margin-bottom: 20px;
 }
 

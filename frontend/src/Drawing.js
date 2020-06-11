@@ -34,7 +34,7 @@ const Drawing = (props) => {
         <script src="canvas.js" type="text/javascript" />
       </Helmet>
       <div className="drawing-area">
-        <canvas />
+        <canvas className="drawing-canvas" />
       </div>
       <div className="drawing-submit-button" onClick={answerDrawing}>
         Trimite

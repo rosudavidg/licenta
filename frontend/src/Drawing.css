@@ -5,7 +5,7 @@
   flex-direction: column;
 }
 
-canvas {
+.drawing-canvas {
   background-image: url(images/clock.png);
   height: 500px;
   width: 500px;

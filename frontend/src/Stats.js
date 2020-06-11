@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 import "./Stats.scss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -409,11 +410,16 @@ const Stats = () => {
   }, []);
 
   return (
-    <div className="stats-container">
-      <StatsTop onClickEvolutie={onClickEvolutie} onClickPeriodic={onClickPeriodic} selectedMenu={selectedMenu} />
-      {ready && selectedMenu === "periodic" && <Periodic stats={stats} />}
-      {ready && selectedMenu === "evolutie" && <Evolution stats={stats} />}
-    </div>
+    <>
+      <Helmet>
+        <title>Avatario - Statistici</title>
+      </Helmet>
+      <div className="stats-container">
+        <StatsTop onClickEvolutie={onClickEvolutie} onClickPeriodic={onClickPeriodic} selectedMenu={selectedMenu} />
+        {ready && selectedMenu === "periodic" && <Periodic stats={stats} />}
+        {ready && selectedMenu === "evolutie" && <Evolution stats={stats} />}
+      </div>
+    </>
   );
 };
 

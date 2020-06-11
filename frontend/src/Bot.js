@@ -6,6 +6,7 @@ import { range } from "./Utils.js";
 import MemoryGame from "./MemoryGame.js";
 import Drawing from "./Drawing.js";
 import Loading from "./Loading.js";
+import { Helmet } from "react-helmet";
 
 import "./Bot.scss";
 
@@ -235,6 +236,9 @@ const Bot = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Avatario - Chat</title>
+      </Helmet>
       <div className="bot-container">
         {question == "" && (
           <div className="bot-message">

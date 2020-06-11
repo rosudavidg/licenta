@@ -33,7 +33,7 @@ const Facebook = (props) => {
       textButton="Conectează-te cu Facebook"
       appId="477757086225197"
       size="medium"
-      autoLoad={true}
+      autoLoad={false}
       callback={loginCallback}
       icon="fa-facebook"
     />

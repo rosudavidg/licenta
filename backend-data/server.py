@@ -374,5 +374,10 @@ def matching_tag():
         return Response("False", status=200, mimetype='application/json')
 
 
+@app.route('/status', methods=['GET'])
+def status():
+    return Response("Server is running!", status=200, mimetype='application/json')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

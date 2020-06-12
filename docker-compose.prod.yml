@@ -1,8 +1,7 @@
 version: "3.1"
 services:
   frontend:
-    # TODO: foloseste imaginea de pe dockerhub
-    image: avatario_frontend_test:latest
+    image: rosudavidg/avatario-frontend:latest
     depends_on:
       - database
       - backend-api
@@ -10,7 +9,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
     ports:
-      - "80:80"
+      - "443:80"
     networks:
       - webnetwork
     stdin_open: true
@@ -20,8 +19,6 @@ services:
       - "5000:5000"
     networks:
       - webnetwork
-    volumes:
-      - ./backend-api:/usr/src/app/
     environment:
       BACKEND_DATA_HOST: backend-data
       BACKEND_DATA_PORT: 5000
@@ -49,7 +46,6 @@ services:
     depends_on:
       - "database"
     volumes:
-      - ./backend-data:/usr/src/app/
       - volume_backend_data:/images
     networks:
       - webnetwork

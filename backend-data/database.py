@@ -355,6 +355,38 @@ def get_face(connection, id):
         return None
 
 
+def get_image_id(connection, id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT image_id FROM faces WHERE id = %s")
+    val = (id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchone()[0]
+    except:
+        connection.rollback()
+        return None
+
+
+def get_faces(connection, image_id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT id, x, y, width, height FROM faces WHERE image_id = %s")
+    val = (image_id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchall()
+    except:
+        connection.rollback()
+        return None
+
+
 def insert_known_persons(connection, persons, user_id):
     cursor = connection.cursor()
 
@@ -478,6 +510,7 @@ def get_traffic_path(connection, id):
     except:
         connection.rollback()
         return None
+
 
 def get_traffic_light(connection, id):
     cursor = connection.cursor()

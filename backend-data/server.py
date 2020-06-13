@@ -168,6 +168,12 @@ def get_face(id):
     # Aduce detaliile despre fata si imagine din baza de date
     face = database.get_face(db_connection, id)
 
+    # Extrage id-ul imaginii
+    image_id = database.get_image_id(db_connection, id)
+
+    # Extrage toate fetele care apar in imagine
+    faces = database.get_faces(db_connection, image_id)
+
     # Daca fata nu a fost gasita
     if face == None:
         return Response(f"Face with id {id} not found.", status=401, mimetype='application/json')
@@ -177,8 +183,37 @@ def get_face(id):
     # Aduce imaginea in memorie
     image = cv2.imread(path)
 
+    # Extrage dimensiunile pozei
+    image_h, image_w, _ = image.shape
+
+    # Calculez dimensiunile cropului
+    crop_x_start, crop_y_start, crop_x_stop, crop_y_stop = [
+        0, 0, image_w - 1, image_h - 1]
+
+    for f_id, f_x, f_y, f_w, f_h in faces:
+        if f_id != id:
+            if f_x > x + width and f_x < crop_x_stop:
+                crop_x_stop = f_x
+            if f_x + f_w < x and f_x + f_w > crop_x_start:
+                crop_x_start = f_x + f_w
+            if f_y > y + height and f_y < crop_y_stop:
+                crop_y_stop = f_y
+            if f_y + f_h < y and f_y + f_h > crop_y_start:
+                crop_y_start = f_y + f_h
+            if f_x + f_w > x + width and f_x <= x + width:
+                crop_x_stop = x + width
+            if f_x < x and f_x + f_w >= x:
+                crop_x_start = x
+            if f_y + f_h > y + height and f_y <= y + height:
+                crop_y_stop = y + height
+            if f_y < y and f_y + f_h >= y:
+                crop_y_start = y
+
     # Adauga bounding box
     cv2.rectangle(image, (x, y), (x + width, y + height), (76, 231, 255), 4)
+
+    # Croparea imaginii
+    image = image[crop_y_start:crop_y_stop, crop_x_start:crop_x_stop]
 
     # Encodeaza imaginea pentru a o putea trimite
     retval, buffer = cv2.imencode('.png', image)

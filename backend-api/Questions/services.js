@@ -110,7 +110,7 @@ const create = async (userId) => {
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "traffic_light";
+  question_type = "face";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);

@@ -48,6 +48,10 @@ COPY animals/ /animals/
 RUN mkdir /dices
 COPY dices/ /dices/
 
+# Adaugare semafoare
+RUN mkdir /traffic-lights
+COPY traffic-lights/ /traffic-lights/
+
 # Adauga wait-for-it
 COPY wait-for-it.sh /
 

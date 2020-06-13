@@ -131,3 +131,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'movie', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare zi sau noapte
+INSERT INTO question_types (name, answer_type)
+    SELECT 'day_or_night', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare semafor
+INSERT INTO question_types (name, answer_type)
+    SELECT 'traffic_light', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

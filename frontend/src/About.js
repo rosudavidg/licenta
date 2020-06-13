@@ -13,6 +13,9 @@ const About = () => {
           <p>Salut!</p>
           <p>Bine ai venit pe Avatario!</p>
           <p>TODO: implement me</p>
+          <h3>
+            <strong>Content Liability</strong>
+          </h3>
         </div>
       </div>
     </>

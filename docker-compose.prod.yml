@@ -9,7 +9,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
     ports:
-      - "443:80"
+      - "3000:80"
     networks:
       - webnetwork
     stdin_open: true

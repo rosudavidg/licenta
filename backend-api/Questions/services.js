@@ -97,13 +97,21 @@ const create = async (userId) => {
   // Adauga intrebari de tip film
   if (await canAskMovie(userId)) question_types.push("movie");
 
+  // Adauga intrebari de tip zi sau noapte
+  // TODO: verifica daca este in program
+  question_types.push("day_or_night");
+
+  // Adauga intrebari de tip semafor
+  question_types.push("traffic_light");
+
   // Adauga intrebari despre tipurile de postari
   // TODO: verifica daca exista cel putin o postare
   question_types.push("post");
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  // question_type = "birthday";
+  question_type = "traffic_light";
+
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
 };
@@ -284,6 +292,12 @@ const createByType = async (userId, type) => {
     case "movie":
       await createMovie(userId);
       break;
+    case "day_or_night":
+      await createDayOrNight(userId);
+      break;
+    case "traffic_light":
+      await createTrafficLight(userId);
+      break;
   }
 };
 
@@ -442,7 +456,7 @@ const createFaceQuestion = async (userId) => {
   const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
     type,
     userId,
-    "Care este prenumele persoanei evidențiate în imagine?",
+    "Care este numele persoanei?",
   ]);
 
   const questionId = question[0]["id"];
@@ -566,6 +580,38 @@ const createLanguage = async (userId) => {
 
   // Adauga detaliile pentru intrebare
   await query("INSERT INTO questions_language (id, language_id) VALUES ($1, $2)", [questionId, language]);
+};
+
+const createTrafficLight = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'traffic_light'"))[0]["id"];
+
+  const trafficLights = await query("SELECT * FROM traffic_lights");
+
+  // Alege un semafor random
+  const trafficLight = trafficLights[Math.floor(Math.random() * trafficLights.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Poți traversa strada?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_traffic_light (id, traffic_light_id) VALUES ($1, $2)", [questionId, trafficLight]);
+};
+
+const createDayOrNight = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'day_or_night'"))[0]["id"];
+
+  // Adauga intrebarea generica
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    `Este zi sau noapte?`,
+  ]);
 };
 
 const createMusicGenre = async (userId) => {
@@ -786,6 +832,17 @@ const getTrafficSign = async (trafficSignId) => {
   return response.data;
 };
 
+const getTrafficLight = async (trafficLightId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/traffic-light/${trafficLightId}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getAccuracy = async (target, guessed) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -886,6 +943,10 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
+    case "day_or_night":
+      question["type"] = "choice";
+      question["choices"] = ["Zi", "Noapte"];
+      break;
     case "music_genre":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
@@ -912,6 +973,18 @@ const getActiveQuestion = async (userId) => {
         question["choices"].push(days_of_the_week[i]["name"]);
       }
 
+      break;
+    case "traffic_light":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+
+      trafficLightId = (
+        await query("SELECT traffic_light_id from questions_traffic_light WHERE id = $1", [questionId])
+      )[0]["traffic_light_id"];
+
+      question["image"] = await getTrafficLight(trafficLightId);
+
+      question["image_type"] = "jpg";
       break;
     case "traffic_sign":
       question["type"] = "choice";
@@ -1042,6 +1115,27 @@ const answerTrafficSign = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerTrafficLight = async (questionId, choice) => {
+  const realAnswer = (
+    await query(
+      "SELECT t.value FROM questions_traffic_light q JOIN traffic_lights t ON q.traffic_light_id = t.id WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["value"];
+
+  const correct = (choice === "Da") === realAnswer;
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_traffic_light (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerSeason = async (questionId, choice) => {
   const guessSeasonId = (await query("SELECT id FROM seasons WHERE name = $1", [choice]))[0]["id"];
   const realSeasonId = getSeasonId(new Date().getMonth());
@@ -1069,6 +1163,30 @@ const answerDrivingLicence = async (questionId, choice) => {
 
   // Seteaza campul driving licence
   await query("UPDATE users SET driving_licence = $1 WHERE id = $2", [choice === "Da", userId]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerDayOrNight = async (questionId, choice) => {
+  const currentHour = new Date().getUTCHours() + 3;
+  let realDayOrNight = "Zi";
+
+  if (currentHour >= 10 && currentHour <= 18) {
+    realDayOrNight = "Zi";
+  } else if (currentHour >= 22 && currentHour <= 6) {
+    isrealDayOrNightDay = "Noapte";
+  } else {
+    await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+    return;
+  }
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_day_or_night (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    choice === realDayOrNight,
+  ]);
 
   // Marcheaza intrebarea drept raspunsa
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
@@ -1115,6 +1233,9 @@ const choose = async (questionId, choice, userId) => {
     case "driving_licence":
       await answerDrivingLicence(questionId, choice);
       break;
+    case "day_or_night":
+      await answerDayOrNight(questionId, choice);
+      break;
     case "language":
       await answerLanguage(questionId, choice);
       break;
@@ -1127,6 +1248,9 @@ const choose = async (questionId, choice, userId) => {
 
       await answerTrafficSign(questionId, choice);
 
+      break;
+    case "traffic_light":
+      await answerTrafficLight(questionId, choice);
       break;
     case "music_genre":
       await answerMusicGenre(questionId, choice, userId);

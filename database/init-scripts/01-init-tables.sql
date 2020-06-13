@@ -401,12 +401,29 @@ CREATE TABLE IF NOT EXISTS traffic_signs (
     name VARCHAR (128) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS traffic_lights (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Calea catre imagine
+    path VARCHAR (128) NOT NULL,
+    -- Daca poti sau nu traversa
+    value BOOLEAN NOT NULL
+);
+
 -- Intrebarile de tip - recunoastere indicator auto
 CREATE TABLE IF NOT EXISTS questions_traffic_sign (
     -- Intrebarea
     id INTEGER REFERENCES questions(id),
     -- Id-ul indicatorului
     traffic_signs INTEGER REFERENCES traffic_signs(id)
+);
+
+-- Intrebarile de tip - semafor
+CREATE TABLE IF NOT EXISTS questions_traffic_light (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul indicatorului
+    traffic_light_id INTEGER REFERENCES traffic_lights(id)
 );
 
 -- Variantele de raspuns la intrebarile de tip - recunoastere indicator auto
@@ -419,6 +436,20 @@ CREATE TABLE IF NOT EXISTS questions_traffic_sign_choices (
 
 -- Raspunsurile utilizatorilor la intrebarile despre indicatoare auto
 CREATE TABLE IF NOT EXISTS answers_traffic_sign (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre semafoare
+CREATE TABLE IF NOT EXISTS answers_traffic_light (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Intrebarea
@@ -683,6 +714,20 @@ CREATE TABLE IF NOT EXISTS answers_movie (
     question_id INTEGER REFERENCES questions(id),
     -- Raspunsul este afirmativ sau pozitiv
     value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre zi sau noapte
+CREATE TABLE IF NOT EXISTS answers_day_or_night (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
     -- Data la care a fost adaugat raspunsul
     created_time TIMESTAMP DEFAULT NOW()
 );

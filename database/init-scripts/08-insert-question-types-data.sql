@@ -149,3 +149,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'directional', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare anul curent
+INSERT INTO question_types (name, answer_type)
+    SELECT 'year', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare cuvant invers
+INSERT INTO question_types (name, answer_type)
+    SELECT 'reversed_word', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

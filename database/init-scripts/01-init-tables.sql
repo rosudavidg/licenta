@@ -766,6 +766,34 @@ CREATE TABLE IF NOT EXISTS answers_directional (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Raspunsurile utilizatorilor la intrebarile despre anul curent
+CREATE TABLE IF NOT EXISTS answers_year (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    name TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre cuvintele inverse
+CREATE TABLE IF NOT EXISTS answers_reversed_word (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    word TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Statisticile utilizatorului
 CREATE TABLE IF NOT EXISTS stats (
     -- Id

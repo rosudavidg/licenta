@@ -111,9 +111,12 @@ const create = async (userId) => {
   // Adauga intrebari despre directie
   question_types.push("directional");
 
+  // Adauga intrebare despre anul curent
+  question_types.push("year");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  // question_type = "directional";
+  question_type = "year";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -303,6 +306,9 @@ const createByType = async (userId, type) => {
       break;
     case "directional":
       await createDirectional(userId);
+      break;
+    case "year":
+      await createYear(userId);
       break;
   }
 };
@@ -657,6 +663,13 @@ const createDayOrNight = async (userId) => {
   ]);
 };
 
+const createYear = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'year'"))[0]["id"];
+
+  // Adauga intrebarea generica
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, `În ce an suntem?`]);
+};
+
 const createMusicGenre = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'music_genre'"))[0]["id"];
 
@@ -996,6 +1009,9 @@ const getActiveQuestion = async (userId) => {
     case "language":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
+      break;
+    case "year":
+      question["type"] = "text";
       break;
     case "day_or_night":
       question["type"] = "choice";
@@ -1375,6 +1391,21 @@ const answerFace = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerYear = async (questionId, answer) => {
+  const currentYear = new Date().getFullYear();
+  const correct = currentYear == answer;
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_year (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerBirthday = async (questionId, date) => {
   // Adauga raspunsul in baza de date
   await query("INSERT INTO answers_birthday (question_id, date) VALUES ($1, $2)", [questionId, date]);
@@ -1599,6 +1630,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "location":
       await answerLocation(questionId, answer, userId);
+      break;
+    case "year":
+      await answerYear(questionId, answer);
       break;
   }
 };

@@ -143,3 +143,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'traffic_light', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare directie
+INSERT INTO question_types (name, answer_type)
+    SELECT 'directional', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

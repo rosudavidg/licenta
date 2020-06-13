@@ -108,9 +108,12 @@ const create = async (userId) => {
   // TODO: verifica daca exista cel putin o postare
   question_types.push("post");
 
+  // Adauga intrebari despre directie
+  question_types.push("directional");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "face";
+  // question_type = "directional";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -297,6 +300,9 @@ const createByType = async (userId, type) => {
       break;
     case "traffic_light":
       await createTrafficLight(userId);
+      break;
+    case "directional":
+      await createDirectional(userId);
       break;
   }
 };
@@ -557,6 +563,43 @@ const createTrafficSign = async (userId) => {
 
   // Adauga detaliile pentru intrebare
   await query("INSERT INTO questions_traffic_sign (id, traffic_signs) VALUES ($1, $2)", [questionId, trafficSignId]);
+};
+
+const createDirectional = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'directional'"))[0]["id"];
+
+  // Extrage toate orasele
+  const cities = await query("SELECT * FROM cities");
+
+  // Alege doua orase random
+  const leftCity = cities[Math.floor(Math.random() * cities.length)]["id"];
+  let rightCity = leftCity;
+
+  while (rightCity === leftCity) {
+    rightCity = cities[Math.floor(Math.random() * cities.length)]["id"];
+  }
+
+  // Alege un oras din cele doua
+  const selectedCities = [leftCity, rightCity];
+  const correctCity = selectedCities[Math.floor(Math.random() * selectedCities.length)];
+
+  // Extrage numele orasului
+  const cityName = (await query("SELECT name FROM cities WHERE id = $1", [correctCity]))[0]["name"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ce fac pentru a merge la ${cityName}?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query(
+    "INSERT INTO questions_directional (id, left_city_id, right_city_id, correct_id) VALUES ($1, $2, $3, $4)",
+    [questionId, leftCity, rightCity, correctCity]
+  );
 };
 
 const createLanguage = async (userId) => {
@@ -854,6 +897,17 @@ const getAccuracy = async (target, guessed) => {
   return response.data;
 };
 
+const getDirectionalImage = async (left, right) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = encodeURI(`/directional?left=${left}&right=${right}`);
+
+  // Cerere catre backend-data pentru a calcula acuratetea
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getMatchingTag = async (tags, word) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -954,6 +1008,28 @@ const getActiveQuestion = async (userId) => {
     case "book":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
+      break;
+    case "directional":
+      question["type"] = "choice";
+      question["choices"] = ["Stânga", "Dreapta"];
+
+      leftCityName = (
+        await query(
+          "SELECT c.name FROM questions_directional q JOIN cities c ON q.left_city_id = c.id WHERE q.id = $1",
+          [questionId]
+        )
+      )[0]["name"];
+
+      rightCityName = (
+        await query(
+          "SELECT c.name FROM questions_directional q JOIN cities c ON q.right_city_id = c.id WHERE q.id = $1",
+          [questionId]
+        )
+      )[0]["name"];
+
+      question["image"] = await getDirectionalImage(leftCityName, rightCityName);
+
+      question["image_type"] = "jpg";
       break;
     case "movie":
       question["type"] = "choice";
@@ -1202,6 +1278,27 @@ const answerLanguage = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerDirectional = async (questionId, choice) => {
+  const realIsLeft =
+    (
+      await query("SELECT COUNT(*) FROM questions_directional WHERE id = $1 AND left_city_id = correct_id", [
+        questionId,
+      ])
+    )[0]["count"] > 0;
+
+  const correct = realIsLeft === (choice === "Stânga");
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_directional (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const choose = async (questionId, choice, userId) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -1238,6 +1335,9 @@ const choose = async (questionId, choice, userId) => {
       break;
     case "language":
       await answerLanguage(questionId, choice);
+      break;
+    case "directional":
+      await answerDirectional(questionId, choice);
       break;
     case "traffic_sign":
       const matchesNoTrafficSign = (await query("SELECT * FROM traffic_signs WHERE name = $1", [choice])).length;

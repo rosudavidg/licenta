@@ -8,6 +8,8 @@ from threading import Lock
 import database
 import cv2
 import base64
+from PIL import Image, ImageFont, ImageDraw
+import numpy as np
 
 app = Flask(__name__)
 
@@ -323,6 +325,44 @@ def get_dice(id):
 
     # Trimite imaginea
     return response
+
+
+@app.route('/directional', methods=['GET'])
+def directional():
+    """Intoarce o poza cu indicatorul directional"""
+
+    try:
+        # Extrag cuvintele din cerere
+        left = request.args.get('left')
+        right = request.args.get('right')
+
+        if left == None or right == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        # Fontul folosit pentru text
+        font = ImageFont.truetype('./Roboto-Black.ttf', 40)
+
+        # Imaginea de baza
+        image = Image.open("./directional-base.png")
+
+        # Adaugarea textului
+        draw = ImageDraw.Draw(image)
+        draw.text((200, 105), left, font=font, fill=(255, 255, 255))
+        draw.text((230, 185), right, font=font, fill=(255, 255, 255))
+
+        # Salarea imaginii
+        image = np.array(image)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        # Encodeaza imaginea pentru a o putea trimite
+        retval, buffer = cv2.imencode('.jpg', image)
+        response = base64.b64encode(buffer)
+
+        # Trimite imaginea
+        return response
+
+    except:
+        return Response("False", status=200, mimetype='application/json')
 
 
 @app.route('/clock', methods=['POST'])

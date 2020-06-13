@@ -1,0 +1,21 @@
+-- Adaugarea in baza de date a oraselor
+INSERT INTO cities (name) VALUES ('București');
+INSERT INTO cities (name) VALUES ('Iași');
+INSERT INTO cities (name) VALUES ('Timișoara');
+INSERT INTO cities (name) VALUES ('Cluj-Napoca');
+INSERT INTO cities (name) VALUES ('Constanța');
+INSERT INTO cities (name) VALUES ('Galați');
+INSERT INTO cities (name) VALUES ('Craiova');
+INSERT INTO cities (name) VALUES ('Brașov');
+INSERT INTO cities (name) VALUES ('Ploiești');
+INSERT INTO cities (name) VALUES ('Oradea');
+INSERT INTO cities (name) VALUES ('Brăila');
+INSERT INTO cities (name) VALUES ('Bacău');
+INSERT INTO cities (name) VALUES ('Arad');
+INSERT INTO cities (name) VALUES ('Pitești');
+INSERT INTO cities (name) VALUES ('Sibiu');
+INSERT INTO cities (name) VALUES ('Târgu Mureș');
+INSERT INTO cities (name) VALUES ('Baia Mare');
+INSERT INTO cities (name) VALUES ('Buzău');
+INSERT INTO cities (name) VALUES ('Suceava');
+INSERT INTO cities (name) VALUES ('Botoșani');

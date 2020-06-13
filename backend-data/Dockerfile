@@ -52,6 +52,10 @@ COPY dices/ /dices/
 RUN mkdir /traffic-lights
 COPY traffic-lights/ /traffic-lights/
 
+# Adauga poza pentru indicatoare orase (plus font)
+COPY directional-base.png /
+COPY Roboto-Black.ttf /
+
 # Adauga wait-for-it
 COPY wait-for-it.sh /
 

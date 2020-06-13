@@ -106,6 +106,14 @@ function shuffle(array) {
   }
 }
 
+const removeRomanianChars = (word) => {
+  return word.split("ă").join("a").split("î").join("i").split("â").join("a").split("ș").join("s").split("ț").join("t");
+};
+
+const sameWord = (word1, word2) => {
+  return removeRomanianChars(word1.toLowerCase()) == removeRomanianChars(word2.toLowerCase());
+};
+
 module.exports = {
   validateFields,
   createUser,
@@ -113,4 +121,5 @@ module.exports = {
   getSeasonId,
   shuffle,
   prefetchUser,
+  sameWord,
 };

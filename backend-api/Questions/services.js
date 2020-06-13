@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const { ServerError } = require("../errors");
 
-const { getSeasonId, shuffle } = require("../utils");
+const { getSeasonId, shuffle, sameWord } = require("../utils");
 
 const activeQuestionExists = async (userId) => {
   // Intoarce true daca exista cel putin o intrebare activa care nu a primit feedback de la utilizator
@@ -114,9 +114,12 @@ const create = async (userId) => {
   // Adauga intrebare despre anul curent
   question_types.push("year");
 
+  // Adauga intrebare tip cuvant invers
+  question_types.push("reversed_word");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "year";
+  question_type = "reversed_word";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -310,6 +313,9 @@ const createByType = async (userId, type) => {
     case "year":
       await createYear(userId);
       break;
+    case "reversed_word":
+      await createReversedWord(userId);
+      break;
   }
 };
 
@@ -453,6 +459,25 @@ const createCommonWords = async (userId) => {
 
   // Adaug intrebarea specifica
   await query("INSERT INTO questions_common_words (id, notify_id) VALUES ($1, $2)", [questionId, notifyId]);
+};
+
+const createReversedWord = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'reversed_word'"))[0]["id"];
+  const common_words = await query("SELECT * FROM common_words");
+
+  const word = common_words[Math.floor(Math.random() * common_words.length)]["word"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Scrie următorul cuvântul invers: ${word}.`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_reversed_word (id, word) VALUES ($1, $2)", [questionId, word]);
 };
 
 const createFaceQuestion = async (userId) => {
@@ -965,6 +990,9 @@ const getActiveQuestion = async (userId) => {
       break;
     case "post_follow_up":
       question["type"] = "confirm";
+      break;
+    case "reversed_word":
+      question["type"] = "text";
       break;
     case "animal":
       const animalId = (await query("SELECT animal_id FROM questions_animal WHERE id = $1", [questionId]))[0][
@@ -1493,6 +1521,21 @@ const answerAnimal = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerReversedWord = async (questionId, answer) => {
+  const word = (await query("SELECT word FROM questions_reversed_word WHERE id = $1", [questionId]))[0]["word"];
+  const correct = sameWord(word.split("").reverse().join(""), answer);
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_reversed_word (question_id, word, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerDices = async (questionId, answer) => {
   // Extrage primul zar
   const firstDiceValue = (
@@ -1633,6 +1676,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "year":
       await answerYear(questionId, answer);
+      break;
+    case "reversed_word":
+      await answerReversedWord(questionId, answer);
       break;
   }
 };

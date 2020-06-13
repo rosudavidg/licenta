@@ -330,6 +330,14 @@ CREATE TABLE IF NOT EXISTS questions_common_words_notify (
     words VARCHAR (256) NOT NULL
 );
 
+-- Intrebarile de tip - cuvant invers
+CREATE TABLE IF NOT EXISTS questions_reversed_word (
+    -- Intrebarea
+    id INTEGER UNIQUE REFERENCES questions(id),
+    -- Cuvantul care trebuie scris invers
+    word VARCHAR (256) NOT NULL
+);
+
 -- Intrebarile de tip - memorare cuvinte - intrebare cuvinte
 CREATE TABLE IF NOT EXISTS questions_common_words (
     -- Intrebarea

@@ -161,3 +161,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'reversed_word', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare rest magazin (cumparaturi magazin)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'change', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare litera urmatoare in alfabet
+INSERT INTO question_types (name, answer_type)
+    SELECT 'next_letter', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

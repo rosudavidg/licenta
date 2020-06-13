@@ -760,6 +760,52 @@ CREATE TABLE IF NOT EXISTS questions_directional (
     correct_id INTEGER REFERENCES cities(id)
 );
 
+-- Intrebarile de tip rest cumparaturi
+CREATE TABLE IF NOT EXISTS questions_change (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Suma totala
+    total INTEGER NOT NULL,
+    -- Valoarea cumparaturilor
+    value INTEGER NOT NULL
+);
+
+-- Intrebarile de tip urmatoarea litera
+CREATE TABLE IF NOT EXISTS questions_next_letter (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Litera
+    letter VARCHAR (1)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile de tip urmatoarea litera
+CREATE TABLE IF NOT EXISTS answers_next_letter (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile rest cumparaturi
+CREATE TABLE IF NOT EXISTS answers_change (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Raspunsurile utilizatorilor la intrebarile despre directie
 CREATE TABLE IF NOT EXISTS answers_directional (
     -- Id

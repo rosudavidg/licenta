@@ -117,9 +117,15 @@ const create = async (userId) => {
   // Adauga intrebare tip cuvant invers
   question_types.push("reversed_word");
 
+  // Adauga intrebare de tip rest magazin
+  question_types.push("change");
+
+  // Adauga intrebare de tip urmatoarea litera
+  question_types.push("next_letter");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "reversed_word";
+  question_type = "next_letter";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -316,6 +322,12 @@ const createByType = async (userId, type) => {
     case "reversed_word":
       await createReversedWord(userId);
       break;
+    case "change":
+      await createChange(userId);
+      break;
+    case "next_letter":
+      await createNextLetter(userId);
+      break;
   }
 };
 
@@ -327,6 +339,48 @@ const createTodayQuestion = async (userId) => {
     userId,
     "Ce zi a săptămânii este astăzi?",
   ]);
+};
+
+const createChange = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'change'"))[0]["id"];
+
+  const totals = [5, 10, 50, 100];
+
+  const total = totals[Math.floor(Math.random() * totals.length)];
+  const value = Math.floor(1 + Math.random() * (total - 1));
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Faci cumpărături de ${value} RON. Plătești cu o bancnotă de ${total} RON. Cât primești rest?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_change (id, total, value) VALUES ($1, $2, $3)", [questionId, total, value]);
+};
+
+const createNextLetter = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'next_letter'"))[0]["id"];
+
+  const valueStart = "C".charCodeAt(0);
+  const valueStop = "Y".charCodeAt(0);
+
+  const letter = String.fromCharCode(Math.floor(valueStart + Math.random() * (valueStop - valueStart + 1)));
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ce literă urmează după ${letter}?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_next_letter (id, letter) VALUES ($1, $2)", [questionId, letter]);
 };
 
 const createClock = async (userId) => {
@@ -1053,6 +1107,23 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
+    case "change":
+      question["type"] = "text";
+      break;
+    case "next_letter":
+      question["type"] = "choice";
+
+      const letter = (await query("SELECT letter FROM questions_next_letter WHERE id = $1", [questionId]))[0]["letter"];
+
+      shuffle(
+        (question["choices"] = [
+          String.fromCharCode(letter.charCodeAt(0) - 2),
+          String.fromCharCode(letter.charCodeAt(0) - 1),
+          String.fromCharCode(letter.charCodeAt(0) + 1),
+          String.fromCharCode(letter.charCodeAt(0) + 2),
+        ])
+      );
+      break;
     case "directional":
       question["type"] = "choice";
       question["choices"] = ["Stânga", "Dreapta"];
@@ -1322,6 +1393,22 @@ const answerLanguage = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerNextLetter = async (questionId, choice) => {
+  const letter = (await query("SELECT letter FROM questions_next_letter WHERE id = $1", [questionId]))[0]["letter"];
+
+  const correct = String.fromCharCode(letter.charCodeAt(0) + 1) == choice;
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_next_letter (question_id, answer, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerDirectional = async (questionId, choice) => {
   const realIsLeft =
     (
@@ -1376,6 +1463,9 @@ const choose = async (questionId, choice, userId) => {
       break;
     case "day_or_night":
       await answerDayOrNight(questionId, choice);
+      break;
+    case "next_letter":
+      await answerNextLetter(questionId, choice);
       break;
     case "language":
       await answerLanguage(questionId, choice);
@@ -1584,6 +1674,22 @@ const answerHometown = async (questionId, answer, userId) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerChange = async (questionId, answer) => {
+  const { total, value } = (await query("SELECT total, value FROM questions_change WHERE id = $1", [questionId]))[0];
+
+  const correct = total - value == answer;
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_change (question_id, answer, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerLocation = async (questionId, answer, userId) => {
   // Extrage orasul natal
   const realLocation = (await query("SELECT location FROM users WHERE id = $1", [userId]))[0]["location"];
@@ -1679,6 +1785,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "reversed_word":
       await answerReversedWord(questionId, answer);
+      break;
+    case "change":
+      await answerChange(questionId, answer);
       break;
   }
 };

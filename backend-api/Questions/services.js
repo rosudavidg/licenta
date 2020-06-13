@@ -123,9 +123,12 @@ const create = async (userId) => {
   // Adauga intrebare de tip urmatoarea litera
   question_types.push("next_letter");
 
+  // Adauga intrebare de tip anterioara litera
+  question_types.push("prev_letter");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "next_letter";
+  question_type = "prev_letter";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -328,6 +331,9 @@ const createByType = async (userId, type) => {
     case "next_letter":
       await createNextLetter(userId);
       break;
+    case "prev_letter":
+      await createPrevLetter(userId);
+      break;
   }
 };
 
@@ -381,6 +387,27 @@ const createNextLetter = async (userId) => {
 
   // Adaug intrebarea specifica
   await query("INSERT INTO questions_next_letter (id, letter) VALUES ($1, $2)", [questionId, letter]);
+};
+
+const createPrevLetter = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'prev_letter'"))[0]["id"];
+
+  const valueStart = "C".charCodeAt(0);
+  const valueStop = "Y".charCodeAt(0);
+
+  const letter = String.fromCharCode(Math.floor(valueStart + Math.random() * (valueStop - valueStart + 1)));
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ce literă este înainte de ${letter}?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_prev_letter (id, letter) VALUES ($1, $2)", [questionId, letter]);
 };
 
 const createClock = async (userId) => {
@@ -1020,6 +1047,7 @@ const getActiveQuestion = async (userId) => {
   )[0];
 
   const questionId = question["id"];
+  let letter = ''
 
   switch (question["type"]) {
     case "face":
@@ -1113,7 +1141,21 @@ const getActiveQuestion = async (userId) => {
     case "next_letter":
       question["type"] = "choice";
 
-      const letter = (await query("SELECT letter FROM questions_next_letter WHERE id = $1", [questionId]))[0]["letter"];
+      letter = (await query("SELECT letter FROM questions_next_letter WHERE id = $1", [questionId]))[0]["letter"];
+
+      shuffle(
+        (question["choices"] = [
+          String.fromCharCode(letter.charCodeAt(0) - 2),
+          String.fromCharCode(letter.charCodeAt(0) - 1),
+          String.fromCharCode(letter.charCodeAt(0) + 1),
+          String.fromCharCode(letter.charCodeAt(0) + 2),
+        ])
+      );
+      break;
+    case "prev_letter":
+      question["type"] = "choice";
+
+      letter = (await query("SELECT letter FROM questions_prev_letter WHERE id = $1", [questionId]))[0]["letter"];
 
       shuffle(
         (question["choices"] = [
@@ -1409,6 +1451,22 @@ const answerNextLetter = async (questionId, choice) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerPrevLetter = async (questionId, choice) => {
+  const letter = (await query("SELECT letter FROM questions_prev_letter WHERE id = $1", [questionId]))[0]["letter"];
+
+  const correct = String.fromCharCode(letter.charCodeAt(0) - 1) == choice;
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_prev_letter (question_id, answer, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerDirectional = async (questionId, choice) => {
   const realIsLeft =
     (
@@ -1466,6 +1524,9 @@ const choose = async (questionId, choice, userId) => {
       break;
     case "next_letter":
       await answerNextLetter(questionId, choice);
+      break;
+    case "prev_letter":
+      await answerPrevLetter(questionId, choice);
       break;
     case "language":
       await answerLanguage(questionId, choice);

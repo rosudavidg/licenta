@@ -173,3 +173,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'next_letter', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare litera anterioara in alfabet
+INSERT INTO question_types (name, answer_type)
+    SELECT 'prev_letter', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

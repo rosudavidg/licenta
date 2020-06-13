@@ -778,8 +778,31 @@ CREATE TABLE IF NOT EXISTS questions_next_letter (
     letter VARCHAR (1)
 );
 
+-- Intrebarile de tip litera anterioara
+CREATE TABLE IF NOT EXISTS questions_prev_letter (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Litera
+    letter VARCHAR (1)
+);
+
+
 -- Raspunsurile utilizatorilor la intrebarile de tip urmatoarea litera
 CREATE TABLE IF NOT EXISTS answers_next_letter (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor la intrebarile de tip litera anterioara
+CREATE TABLE IF NOT EXISTS answers_prev_letter (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Intrebarea

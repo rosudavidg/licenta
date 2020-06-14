@@ -512,6 +512,22 @@ def get_traffic_path(connection, id):
         return None
 
 
+def get_maze(connection, id):
+    cursor = connection.cursor()
+
+    sql = ("SELECT path FROM mazes WHERE id = %s")
+    val = (id, )
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+
+        return cursor.fetchone()
+    except:
+        connection.rollback()
+        return None
+
+
 def get_traffic_light(connection, id):
     cursor = connection.cursor()
 

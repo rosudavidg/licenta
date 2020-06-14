@@ -441,6 +441,16 @@ CREATE TABLE IF NOT EXISTS traffic_signs (
     name VARCHAR (128) NOT NULL
 );
 
+-- Pozele cu jocul de tip labirint
+CREATE TABLE IF NOT EXISTS mazes (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Calea catre imagine
+    path VARCHAR (128) NOT NULL,
+    -- Raspunsul corect
+    correct VARCHAR (1) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS traffic_lights (
     -- Id
     id SERIAL PRIMARY KEY,
@@ -456,6 +466,28 @@ CREATE TABLE IF NOT EXISTS questions_traffic_sign (
     id INTEGER REFERENCES questions(id),
     -- Id-ul indicatorului
     traffic_signs INTEGER REFERENCES traffic_signs(id)
+);
+
+-- Intrebarile de tip - maze
+CREATE TABLE IF NOT EXISTS questions_maze (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul jocului
+    maze_id INTEGER REFERENCES mazes(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre jocul maze
+CREATE TABLE IF NOT EXISTS answers_maze (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
 );
 
 -- Intrebarile de tip - semafor

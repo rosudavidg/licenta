@@ -257,3 +257,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'subtraction', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare pentru labirint
+INSERT INTO question_types (name, answer_type)
+    SELECT 'maze', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';

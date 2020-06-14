@@ -271,6 +271,25 @@ def get_traffic_sign(id):
     return response
 
 
+@app.route('/maze/<id>', methods=['GET'])
+def get_maze(id):
+    """
+    Intoarce jocul labirint (imaginea)
+    """
+
+    path = database.get_maze(db_connection, id)
+
+    # Aduce imaginea in memorie
+    image = cv2.imread(path[0], cv2.IMREAD_UNCHANGED)
+
+    # Encodeaza imaginea pentru a o putea trimite
+    retval, buffer = cv2.imencode('.png', image)
+    response = base64.b64encode(buffer)
+
+    # Trimite imaginea
+    return response
+
+
 @app.route('/traffic-light/<id>', methods=['GET'])
 def get_traffic_light(id):
     """

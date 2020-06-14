@@ -56,6 +56,10 @@ COPY traffic-lights/ /traffic-lights/
 COPY directional-base.png /
 COPY Roboto-Black.ttf /
 
+# Adauga poza pentru jocul labirint
+RUN mkdir /mazes
+COPY mazes/ /mazes/
+
 # Adauga wait-for-it
 COPY wait-for-it.sh /
 

@@ -150,9 +150,12 @@ const create = async (userId) => {
   // Adauga intrebare despre poligon
   question_types.push("polygon");
 
+  // Adauga intrebare despre jocul labirint
+  question_types.push("maze");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "clock";
+  question_type = "maze";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -381,6 +384,9 @@ const createByType = async (userId, type) => {
       break;
     case "money":
       await createMoney(userId);
+      break;
+    case "maze":
+      await createMaze(userId);
       break;
   }
 };
@@ -868,6 +874,28 @@ const createTrafficSign = async (userId) => {
   await query("INSERT INTO questions_traffic_sign (id, traffic_signs) VALUES ($1, $2)", [questionId, trafficSignId]);
 };
 
+const createMaze = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'maze'"))[0]["id"];
+
+  // Extrage toate jocurile
+  const mazes = await query("SELECT * FROM mazes");
+
+  // Alege un joc random
+  const mazeId = mazes[Math.floor(Math.random() * mazes.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Care drum duce la măr?",
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_maze (id, maze_id) VALUES ($1, $2)", [questionId, mazeId]);
+};
+
 const createDirectional = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'directional'"))[0]["id"];
 
@@ -1207,6 +1235,17 @@ const getTrafficLight = async (trafficLightId) => {
   return response.data;
 };
 
+const getMaze = async (mazeId) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/maze/${mazeId}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getAccuracy = async (target, guessed) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -1313,11 +1352,9 @@ const getActiveQuestion = async (userId) => {
       break;
     case "birthday":
       question["type"] = "date";
-
       break;
     case "today_date":
       question["type"] = "date";
-
       break;
     case "clock":
       question["type"] = "clock";
@@ -1481,6 +1518,15 @@ const getActiveQuestion = async (userId) => {
 
       question["image_type"] = "jpg";
       break;
+    case "maze":
+      question["type"] = "choice";
+      question["choices"] = ["A", "B", "C"];
+
+      mazeId = (await query("SELECT maze_id from questions_maze WHERE id = $1", [questionId]))[0]["maze_id"];
+
+      question["image"] = await getMaze(mazeId);
+      question["image_type"] = "png";
+      break;
     case "traffic_sign":
       question["type"] = "choice";
       question["choices"] = [];
@@ -1625,6 +1671,24 @@ const answerTrafficLight = async (questionId, choice) => {
 
   // Adauga raspunsul in baza de date
   await query("INSERT INTO answers_traffic_light (question_id, name, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    choice,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerMaze = async (questionId, choice) => {
+  const correctAnswer = (
+    await query("SELECT m.correct FROM questions_maze q JOIN mazes m ON q.maze_id = m.id WHERE q.id = $1", [questionId])
+  )[0]["correct"];
+
+  const correct = choice === correctAnswer;
+
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_maze (question_id, answer, correct) VALUES ($1, $2, $3)", [
     questionId,
     choice,
     correct,
@@ -1823,6 +1887,9 @@ const choose = async (questionId, choice, userId) => {
       break;
     case "traffic_light":
       await answerTrafficLight(questionId, choice);
+      break;
+    case "maze":
+      await answerMaze(questionId, choice);
       break;
     case "music_genre":
       await answerMusicGenre(questionId, choice, userId);

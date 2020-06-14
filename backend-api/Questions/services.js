@@ -129,9 +129,15 @@ const create = async (userId) => {
   // Adauga intrebare - are copii
   question_types.push("children");
 
+  // Adauga intrebare - are frati
+  question_types.push("brothers");
+
+  // Adauga intrebare - are surori
+  question_types.push("sisters");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "children";
+  question_type = "sisters";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -340,6 +346,12 @@ const createByType = async (userId, type) => {
     case "children":
       await createChildren(userId);
       break;
+    case "brothers":
+      await createBrothers(userId);
+      break;
+    case "sisters":
+      await createSisters(userId);
+      break;
   }
 };
 
@@ -432,10 +444,34 @@ const createChildren = async (userId) => {
   await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Ai copii?"]);
 };
 
+const createBrothers = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'brothers'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Ai frați?"]);
+};
+
+const createSisters = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'sisters'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Ai surori?"]);
+};
+
 const createChildrenFollowUp = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'children_follow_up'"))[0]["id"];
 
   await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Câți copii ai?"]);
+};
+
+const createBrothersFollowUp = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'brothers_follow_up'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Câți frați ai?"]);
+};
+
+const createSistersFollowUp = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'sisters_follow_up'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Câte surori ai?"]);
 };
 
 const createHometown = async (userId) => {
@@ -1153,7 +1189,21 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
+    case "brothers":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
+    case "sisters":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
     case "children_follow_up":
+      question["type"] = "text";
+      break;
+    case "brothers_follow_up":
+      question["type"] = "text";
+      break;
+    case "sisters_follow_up":
       question["type"] = "text";
       break;
     case "book":
@@ -1547,6 +1597,12 @@ const choose = async (questionId, choice, userId) => {
     case "children":
       await answerChildren(questionId, choice, userId);
       break;
+    case "brothers":
+      await answerBrothers(questionId, choice, userId);
+      break;
+    case "sisters":
+      await answerSisters(questionId, choice, userId);
+      break;
     case "day_or_night":
       await answerDayOrNight(questionId, choice);
       break;
@@ -1782,7 +1838,36 @@ const answerChange = async (questionId, answer) => {
 const answerChildrenFollowUp = async (questionId, answer) => {
   if (!isNaN(answer)) {
     // Adaug raspunsul
-    await query("INSERT INTO answers_children_follow_up (question_id, count) VALUES ($1, $2)", [questionId, answer]);
+    await query("INSERT INTO answers_children_follow_up (question_id, count) VALUES ($1, $2)", [
+      questionId,
+      Number(answer),
+    ]);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerBrothersFollowUp = async (questionId, answer) => {
+  if (!isNaN(answer)) {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_brothers_follow_up (question_id, count) VALUES ($1, $2)", [
+      questionId,
+      Number(answer),
+    ]);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerSistersFollowUp = async (questionId, answer) => {
+  if (!isNaN(answer)) {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_sisters_follow_up (question_id, count) VALUES ($1, $2)", [
+      questionId,
+      Number(answer),
+    ]);
   }
 
   // Marcheaza intrebarea drept raspunsa
@@ -1839,6 +1924,47 @@ const answerChildren = async (questionId, answer, userId) => {
 
     // Adauga intrebare follow-up
     await createChildrenFollowUp(userId, questionId);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerBrothers = async (questionId, answer, userId) => {
+  if (answer === "Nu") {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_brothers (question_id, answer, value) VALUES ($1, $2, TRUE)", [
+      questionId,
+      answer,
+    ]);
+  } else {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_brothers (question_id, answer, value) VALUES ($1, $2, FALSE)", [
+      questionId,
+      answer,
+    ]);
+
+    // Adauga intrebare follow-up
+    await createBrothersFollowUp(userId, questionId);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerSisters = async (questionId, answer, userId) => {
+  if (answer === "Nu") {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_sisters (question_id, answer, value) VALUES ($1, $2, TRUE)", [questionId, answer]);
+  } else {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_sisters (question_id, answer, value) VALUES ($1, $2, FALSE)", [
+      questionId,
+      answer,
+    ]);
+
+    // Adauga intrebare follow-up
+    await createSistersFollowUp(userId, questionId);
   }
 
   // Marcheaza intrebarea drept raspunsa
@@ -1912,6 +2038,12 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "children_follow_up":
       await answerChildrenFollowUp(questionId, answer, userId);
+      break;
+    case "brothers_follow_up":
+      await answerBrothersFollowUp(questionId, answer, userId);
+      break;
+    case "sisters_follow_up":
+      await answerSistersFollowUp(questionId, answer, userId);
       break;
   }
 };

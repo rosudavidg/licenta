@@ -843,8 +843,60 @@ CREATE TABLE IF NOT EXISTS answers_children (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Raspunsurile utilizatorilor drespre frati
+CREATE TABLE IF NOT EXISTS answers_brothers (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Valoarea raspunsului
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor drespre surori
+CREATE TABLE IF NOT EXISTS answers_sisters (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Valoarea raspunsului
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Raspunsurile utilizatorilor drespre copii (follow up - cati copii)
 CREATE TABLE IF NOT EXISTS answers_children_follow_up (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Valoarea raspunsului
+    count INTEGER,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor drespre frati (follow up - cati frati)
+CREATE TABLE IF NOT EXISTS answers_brothers_follow_up (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Valoarea raspunsului
+    count INTEGER,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor drespre surori (follow up - cate surori)
+CREATE TABLE IF NOT EXISTS answers_sisters_follow_up (
     -- Id
     id SERIAL PRIMARY KEY,
     -- Intrebarea

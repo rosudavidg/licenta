@@ -186,8 +186,32 @@ INSERT INTO question_types (name, answer_type)
     FROM answer_types
     WHERE answer_types.name = 'choice';
 
+-- Intrebare daca are frati
+INSERT INTO question_types (name, answer_type)
+    SELECT 'brothers', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare daca are surori
+INSERT INTO question_types (name, answer_type)
+    SELECT 'sisters', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
 -- Intrebare daca are copii (cati copii)
 INSERT INTO question_types (name, answer_type)
     SELECT 'children_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare daca are frati (cati frati)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'brothers_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare daca are surori (cate surori)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'sisters_follow_up', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';

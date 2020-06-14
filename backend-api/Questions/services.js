@@ -141,9 +141,12 @@ const create = async (userId) => {
   // Adauga intrebare despre culori
   question_types.push("colors");
 
+  // Adauga intrebare despre scadere
+  question_types.push("subtraction_notify");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "colors";
+  question_type = "subtraction_notify";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -363,6 +366,9 @@ const createByType = async (userId, type) => {
       break;
     case "colors":
       await createColors(userId);
+      break;
+    case "subtraction_notify":
+      await createSubtractionNotify(userId);
       break;
   }
 };
@@ -603,6 +609,41 @@ const createCommonWordsNotify = async (userId) => {
 
   // Adauga detaliile pentru intrebare
   await query("INSERT INTO questions_common_words_notify (id, words) VALUES ($1, $2)", [questionId, elements]);
+};
+
+const createSubtractionNotify = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'subtraction_notify'"))[0]["id"];
+
+  const numbers = [7, 13, 17];
+  const number = numbers[Math.floor(Math.random() * numbers.length)];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Scade din 100 numărul ${number}!`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_subtraction_notify (id, number) VALUES ($1, $2)", [questionId, number]);
+};
+
+const createSubtraction = async (userId, notifyId, number) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'subtraction'"))[0]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Mai scade ${number} o dată!`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adauga detaliile pentru intrebare
+  await query("INSERT INTO questions_subtraction (id, notify_id) VALUES ($1, $2)", [questionId, notifyId]);
 };
 
 const createBirthday = async (userId) => {
@@ -1224,12 +1265,14 @@ const getActiveQuestion = async (userId) => {
       break;
     case "clock":
       question["type"] = "clock";
-
       break;
     case "hometown":
       question["type"] = "text";
       break;
     case "location":
+      question["type"] = "text";
+      break;
+    case "subtraction_notify":
       question["type"] = "text";
       break;
     case "language":
@@ -1417,6 +1460,9 @@ const getActiveQuestion = async (userId) => {
       }
       break;
     case "common_words":
+      question["type"] = "text";
+      break;
+    case "subtraction":
       question["type"] = "text";
       break;
     case "memory_game":
@@ -1814,6 +1860,66 @@ const answerCommonWords = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerSubtractionNotify = async (questionId, answer, userId) => {
+  const number = (await query("SELECT number FROM questions_subtraction_notify WHERE id = $1", [questionId]))[0][
+    "number"
+  ];
+
+  let correct = false;
+
+  if (!isNaN(answer)) {
+    // Calculez corectitudinea raspunsului
+    correct = 100 - number === Number(answer);
+  }
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_subtraction (question_id, correct) VALUES ($1, $2)", [questionId, correct]);
+
+  // Adauga intrebarea urmatoare
+  await createSubtraction(userId, questionId, number);
+
+  // Incrementez numarul de raspunsuri
+  await query("UPDATE questions_subtraction_notify SET answers = answers + 1 WHERE id = $1", [questionId]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerSubtraction = async (questionId, answer, userId) => {
+  // Extrage numarul notificarii
+  const notifyId = (
+    await query(
+      "SELECT n.id as notify_id FROM questions q JOIN questions_subtraction w ON q.id = w.id JOIN questions_subtraction_notify n ON n.id = w.notify_id WHERE q.id = $1",
+      [questionId]
+    )
+  )[0]["notify_id"];
+
+  const { number, answers, answers_target } = (
+    await query("SELECT number, answers,answers_target FROM questions_subtraction_notify WHERE id = $1", [notifyId])
+  )[0];
+
+  let correct = false;
+
+  if (!isNaN(answer)) {
+    // Calculez corectitudinea raspunsului
+    correct = 100 - number * (answers + 1) === Number(answer);
+  }
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_subtraction (question_id, correct) VALUES ($1, $2)", [questionId, correct]);
+
+  if (answers_target > answers + 1) {
+    // Adauga intrebarea urmatoare
+    await createSubtraction(userId, notifyId, number);
+  }
+
+  // Incrementez numarul de raspunsuri
+  await query("UPDATE questions_subtraction_notify SET answers = answers + 1 WHERE id = $1", [notifyId]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerAnimal = async (questionId, answer) => {
   // Parseaza cuvantul
   const name = answer.split(new RegExp(",|-| |\\+|\\.")).filter((e) => e.length > 0)[0];
@@ -2150,6 +2256,12 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "common_words":
       await answerCommonWords(questionId, answer);
+      break;
+    case "subtraction_notify":
+      await answerSubtractionNotify(questionId, answer, userId);
+      break;
+    case "subtraction":
+      await answerSubtraction(questionId, answer, userId);
       break;
     case "animal":
       await answerAnimal(questionId, answer);

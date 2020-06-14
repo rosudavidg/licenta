@@ -330,6 +330,38 @@ CREATE TABLE IF NOT EXISTS questions_common_words_notify (
     words VARCHAR (256) NOT NULL
 );
 
+-- Intrebarile de tip - scadere - prima scadere
+CREATE TABLE IF NOT EXISTS questions_subtraction_notify (
+    -- Intrebarea
+    id INTEGER UNIQUE REFERENCES questions(id),
+    -- Numarul de raspunsuri care trebuie date
+    answers_target INTEGER DEFAULT 5,
+    -- Numarul de raspunsuri date
+    answers INTEGER DEFAULT 0,
+    -- Numarul cu care trebuie sa scada
+    number INTEGER NOT NULL
+);
+
+-- Intrebarile de tip - scadere - de a a doua scadere
+CREATE TABLE IF NOT EXISTS questions_subtraction (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul primei intrebari
+    notify_id INTEGER REFERENCES questions_subtraction_notify(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre scaderi
+CREATE TABLE IF NOT EXISTS answers_subtraction (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul este sau nu corect
+    correct BOOLEAN,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Intrebarile de tip - cuvant invers
 CREATE TABLE IF NOT EXISTS questions_reversed_word (
     -- Intrebarea

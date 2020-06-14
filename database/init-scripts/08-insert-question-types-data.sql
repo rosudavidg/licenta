@@ -233,3 +233,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'colors', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare pentru scadere (prima)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'subtraction_notify', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
+-- Intrebare pentru scadere (de la a doua)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'subtraction', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

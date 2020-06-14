@@ -975,6 +975,38 @@ CREATE TABLE IF NOT EXISTS answers_reversed_word (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Culori
+CREATE TABLE IF NOT EXISTS colors (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Numele culorii
+    name TEXT NOT NULL,
+    -- Codul HEX
+    hex VARCHAR (7)
+);
+
+-- Intrebarile de tip culoare
+CREATE TABLE IF NOT EXISTS questions_colors (
+    -- Intrebarea
+    id INTEGER REFERENCES questions(id),
+    -- Id-ul culorii
+    color_id INTEGER REFERENCES colors(id)
+);
+
+-- Raspunsurile utilizatorilor la intrebarile despre culori
+CREATE TABLE IF NOT EXISTS answers_colors (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Raspunsul este corect sau nu
+    correct BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Statisticile utilizatorului
 CREATE TABLE IF NOT EXISTS stats (
     -- Id

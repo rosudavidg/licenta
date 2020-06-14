@@ -227,3 +227,9 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'pets_follow_up', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare despre culori
+INSERT INTO question_types (name, answer_type)
+    SELECT 'colors', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

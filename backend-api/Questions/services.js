@@ -138,9 +138,12 @@ const create = async (userId) => {
   // Adauga intrebare - are animale de companie
   question_types.push("pets");
 
+  // Adauga intrebare despre culori
+  question_types.push("colors");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "pets";
+  question_type = "colors";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -358,6 +361,9 @@ const createByType = async (userId, type) => {
     case "pets":
       await createPets(userId);
       break;
+    case "colors":
+      await createColors(userId);
+      break;
   }
 };
 
@@ -432,6 +438,25 @@ const createPrevLetter = async (userId) => {
 
   // Adaug intrebarea specifica
   await query("INSERT INTO questions_prev_letter (id, letter) VALUES ($1, $2)", [questionId, letter]);
+};
+
+const createColors = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'colors'"))[0]["id"];
+  const colors = await query("SELECT * FROM colors");
+
+  const color = colors[Math.floor(Math.random() * colors.length)]["id"];
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    "Ce culoare este?",
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_colors (id, color_id) VALUES ($1, $2)", [questionId, color]);
 };
 
 const createClock = async (userId) => {
@@ -1107,6 +1132,17 @@ const getDirectionalImage = async (left, right) => {
   return response.data;
 };
 
+const getColorImage = async (hex) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = encodeURI(`/color?color=${hex}`);
+
+  // Cerere catre backend-data pentru a calcula acuratetea
+  const response = await axios.get(`http://${host}:${port}${path}`);
+
+  return response.data;
+};
+
 const getMatchingTag = async (tags, word) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -1293,6 +1329,19 @@ const getActiveQuestion = async (userId) => {
       )[0]["name"];
 
       question["image"] = await getDirectionalImage(leftCityName, rightCityName);
+
+      question["image_type"] = "jpg";
+      break;
+    case "colors":
+      question["type"] = "text";
+
+      colorHex = (
+        await query("SELECT c.hex FROM questions_colors q JOIN colors c ON q.color_id = c.id WHERE q.id = $1", [
+          questionId,
+        ])
+      )[0]["hex"];
+
+      question["image"] = await getColorImage(colorHex);
 
       question["image_type"] = "jpg";
       break;
@@ -1855,6 +1904,28 @@ const answerHometown = async (questionId, answer, userId) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerColors = async (questionId, answer) => {
+  // Extrage culoarea reala
+  const realColor = (
+    await query("SELECT c.name FROM questions_colors q JOIN colors c ON q.color_id = c.id WHERE q.id = $1", [
+      questionId,
+    ])
+  )[0]["name"];
+
+  const accuracy = await getAccuracy(realColor, answer);
+  const correct = accuracy === 1;
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_colors (question_id, answer, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerChange = async (questionId, answer) => {
   const { total, value } = (await query("SELECT total, value FROM questions_change WHERE id = $1", [questionId]))[0];
 
@@ -2112,6 +2183,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "pets_follow_up":
       await answerPetsFollowUp(questionId, answer, userId);
+      break;
+    case "colors":
+      await answerColors(questionId, answer);
       break;
   }
 };

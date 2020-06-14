@@ -350,7 +350,34 @@ def directional():
         draw.text((200, 105), left, font=font, fill=(255, 255, 255))
         draw.text((230, 185), right, font=font, fill=(255, 255, 255))
 
-        # Salarea imaginii
+        # Scalarea imaginii
+        image = np.array(image)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        # Encodeaza imaginea pentru a o putea trimite
+        retval, buffer = cv2.imencode('.jpg', image)
+        response = base64.b64encode(buffer)
+
+        # Trimite imaginea
+        return response
+
+    except:
+        return Response("False", status=200, mimetype='application/json')
+
+
+@app.route('/color', methods=['GET'])
+def color():
+    """Intoarce o poza cu o singura culoare"""
+
+    try:
+        colorhex = request.args.get('color')
+
+        if colorhex == None:
+            return Response("False", status=400, mimetype='application/json')
+
+        # Imaginea de baza
+        image = Image.new('RGBA', (200, 200), color=f'#{colorhex}')
+
         image = np.array(image)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 

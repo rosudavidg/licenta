@@ -126,9 +126,12 @@ const create = async (userId) => {
   // Adauga intrebare de tip anterioara litera
   question_types.push("prev_letter");
 
+  // Adauga intrebare - are copii
+  question_types.push("children");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "prev_letter";
+  question_type = "children";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -334,6 +337,9 @@ const createByType = async (userId, type) => {
     case "prev_letter":
       await createPrevLetter(userId);
       break;
+    case "children":
+      await createChildren(userId);
+      break;
   }
 };
 
@@ -418,6 +424,18 @@ const createClock = async (userId) => {
     userId,
     "Desenează un ceas care indică ora 10:15!",
   ]);
+};
+
+const createChildren = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'children'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Ai copii?"]);
+};
+
+const createChildrenFollowUp = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'children_follow_up'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Câți copii ai?"]);
 };
 
 const createHometown = async (userId) => {
@@ -1047,7 +1065,7 @@ const getActiveQuestion = async (userId) => {
   )[0];
 
   const questionId = question["id"];
-  let letter = ''
+  let letter = "";
 
   switch (question["type"]) {
     case "face":
@@ -1130,6 +1148,13 @@ const getActiveQuestion = async (userId) => {
     case "music_genre":
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
+      break;
+    case "children":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
+    case "children_follow_up":
+      question["type"] = "text";
       break;
     case "book":
       question["type"] = "choice";
@@ -1519,6 +1544,9 @@ const choose = async (questionId, choice, userId) => {
     case "driving_licence":
       await answerDrivingLicence(questionId, choice);
       break;
+    case "children":
+      await answerChildren(questionId, choice, userId);
+      break;
     case "day_or_night":
       await answerDayOrNight(questionId, choice);
       break;
@@ -1751,6 +1779,16 @@ const answerChange = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerChildrenFollowUp = async (questionId, answer) => {
+  if (!isNaN(answer)) {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_children_follow_up (question_id, count) VALUES ($1, $2)", [questionId, answer]);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerLocation = async (questionId, answer, userId) => {
   // Extrage orasul natal
   const realLocation = (await query("SELECT location FROM users WHERE id = $1", [userId]))[0]["location"];
@@ -1779,6 +1817,28 @@ const answerMusicGenre = async (questionId, answer, userId) => {
 
     // Adauga intrebare follow-up
     await createMusicGenreFollowUp(userId, questionId);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerChildren = async (questionId, answer, userId) => {
+  if (answer === "Nu") {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_children (question_id, answer, value) VALUES ($1, $2, TRUE)", [
+      questionId,
+      answer,
+    ]);
+  } else {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_children (question_id, answer, value) VALUES ($1, $2, FALSE)", [
+      questionId,
+      answer,
+    ]);
+
+    // Adauga intrebare follow-up
+    await createChildrenFollowUp(userId, questionId);
   }
 
   // Marcheaza intrebarea drept raspunsa
@@ -1849,6 +1909,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "change":
       await answerChange(questionId, answer);
+      break;
+    case "children_follow_up":
+      await answerChildrenFollowUp(questionId, answer, userId);
       break;
   }
 };

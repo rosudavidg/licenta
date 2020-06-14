@@ -179,3 +179,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'prev_letter', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'choice';
+
+-- Intrebare daca are copii
+INSERT INTO question_types (name, answer_type)
+    SELECT 'children', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare daca are copii (cati copii)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'children_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

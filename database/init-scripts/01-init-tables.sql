@@ -829,6 +829,33 @@ CREATE TABLE IF NOT EXISTS answers_change (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Raspunsurile utilizatorilor drespre copii
+CREATE TABLE IF NOT EXISTS answers_children (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Valoarea raspunsului
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Raspunsurile utilizatorilor drespre copii (follow up - cati copii)
+CREATE TABLE IF NOT EXISTS answers_children_follow_up (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Valoarea raspunsului
+    count INTEGER,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
+
 -- Raspunsurile utilizatorilor la intrebarile despre directie
 CREATE TABLE IF NOT EXISTS answers_directional (
     -- Id

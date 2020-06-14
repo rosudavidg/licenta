@@ -77,4 +77,9 @@ def is_correct_polygon(path):
         if p > rest_threshold:
             return False
 
+    black_percentage_total = black_percentage(image, (0, 0), (500, 500))
+
+    if black_percentage_total > 0.08:
+        return False
+
     return True

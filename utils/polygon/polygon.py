@@ -70,14 +70,17 @@ def correct_draw(path):
     #     if p < threshold:
     #         return False
 
-    for rest_segment_no in range(len(rest_segments)):
-        new_image = rotate_image(image, rest_rotations[rest_segment_no])
-        p = black_percentage(
-            new_image, rest_segments[rest_segment_no][0], rest_segments[rest_segment_no][1])
+    # for rest_segment_no in range(len(rest_segments)):
+    #     new_image = rotate_image(image, rest_rotations[rest_segment_no])
+    #     p = black_percentage(
+    #         new_image, rest_segments[rest_segment_no][0], rest_segments[rest_segment_no][1])
 
-        # print(p)
-        if p > rest_threshold:
-            return False
+    #     # print(p)
+    #     if p > rest_threshold:
+    #         return False
+
+    # all = black_percentage(image, (0, 0), (500, 500))
+    # print(all)
 
     new_image = rotate_image(image, rest_rotations[6])
     new_image = cv2.rectangle(

@@ -168,6 +168,12 @@ INSERT INTO question_types (name, answer_type)
     FROM answer_types
     WHERE answer_types.name = 'text';
 
+-- Intrebare bani (adaugare)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'money', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';
+
 -- Intrebare litera urmatoare in alfabet
 INSERT INTO question_types (name, answer_type)
     SELECT 'next_letter', answer_types.id

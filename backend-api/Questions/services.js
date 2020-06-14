@@ -144,9 +144,12 @@ const create = async (userId) => {
   // Adauga intrebare despre scadere
   question_types.push("subtraction_notify");
 
+  // Adauga intrebare despre bani (adunare)
+  question_types.push("money");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "subtraction_notify";
+  question_type = "change";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -370,6 +373,9 @@ const createByType = async (userId, type) => {
     case "subtraction_notify":
       await createSubtractionNotify(userId);
       break;
+    case "money":
+      await createMoney(userId);
+      break;
   }
 };
 
@@ -402,6 +408,29 @@ const createChange = async (userId) => {
 
   // Adaug intrebarea specifica
   await query("INSERT INTO questions_change (id, total, value) VALUES ($1, $2, $3)", [questionId, total, value]);
+};
+
+const createMoney = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'money'"))[0]["id"];
+
+  const initial = Math.floor(20 + Math.random() * 100);
+  const increase = Math.floor(20 + Math.random() * 100);
+
+  // Adauga intrebarea generica
+  const question = await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3) RETURNING *", [
+    type,
+    userId,
+    `Ai ${initial} de lei. Primești ${increase}. Cât ai acum?`,
+  ]);
+
+  const questionId = question[0]["id"];
+
+  // Adaug intrebarea specifica
+  await query("INSERT INTO questions_money (id, initial, increase) VALUES ($1, $2, $3)", [
+    questionId,
+    initial,
+    increase,
+  ]);
 };
 
 const createNextLetter = async (userId) => {
@@ -1325,6 +1354,9 @@ const getActiveQuestion = async (userId) => {
     case "change":
       question["type"] = "text";
       break;
+    case "money":
+      question["type"] = "text";
+      break;
     case "next_letter":
       question["type"] = "choice";
 
@@ -2035,10 +2067,28 @@ const answerColors = async (questionId, answer) => {
 const answerChange = async (questionId, answer) => {
   const { total, value } = (await query("SELECT total, value FROM questions_change WHERE id = $1", [questionId]))[0];
 
-  const correct = total - value == answer;
+  const correct = answer.split(" ").includes((total - value).toString());
 
   // Adaug raspunsul
   await query("INSERT INTO answers_change (question_id, answer, correct) VALUES ($1, $2, $3)", [
+    questionId,
+    answer,
+    correct,
+  ]);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
+const answerMoney = async (questionId, answer) => {
+  const { initial, increase } = (
+    await query("SELECT initial, increase FROM questions_money WHERE id = $1", [questionId])
+  )[0];
+
+  const correct = answer.split(" ").includes((initial + increase).toString());
+
+  // Adaug raspunsul
+  await query("INSERT INTO answers_money (question_id, answer, correct) VALUES ($1, $2, $3)", [
     questionId,
     answer,
     correct,
@@ -2283,6 +2333,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "change":
       await answerChange(questionId, answer);
+      break;
+    case "money":
+      await answerMoney(questionId, answer);
       break;
     case "children_follow_up":
       await answerChildrenFollowUp(questionId, answer, userId);

@@ -109,7 +109,6 @@ def is_correct_clock(filename):
 
     # Calcularea numarului de cifre corecte
     for hour in range(1, 13):
-        # TODO: inverseaza cele doua for-uri (urmatoare)
         for c in regs_contours[hour]:
             x, y, w, h = cv2.boundingRect(c)
             digit = thresh[y:y+h, x:x+w]
@@ -131,14 +130,36 @@ def is_correct_clock(filename):
                     correct += 1
                     predicted_list.remove(e)
 
-    # TODO: mecasism precizie limbi ceas
-
     # Calculare precizie
     acc = correct / ex_correct
 
-    print(acc)
+    # Precizie linie minutar
+    counter = 0
+    for i in range(270, 390):
+        for j in range(210, 280):
+            r, g, b = image[j][i]
+            if r < 50 and g < 50 and b < 50:
+                counter += 1
+
+    acc_line_1 = counter / ((390 - 270 + 1) * (280 - 210 + 1))
+
+    # print(acc_line_1)
+    if acc_line_1 < 0.06:
+        return False
+
+    counter = 0
+    for i in range(150, 250):
+        for j in range(180, 270):
+            r, g, b = image[j][i]
+            if r < 50 and g < 50 and b < 50:
+                counter += 1
+
+    acc_line_2 = counter / ((250 - 150 + 1) * (270 - 180 + 1))
+
+    # print(acc_line_2)
+    if acc_line_2 < 0.05:
+        return False
+
+    # print(acc)
 
     return acc > 0.5
-
-
-# res = is_correct_clock('/images/2965321766845954/clocks/19.png')

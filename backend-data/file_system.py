@@ -57,6 +57,10 @@ def create_new_dir(data):
     clock_path = 'images/' + user_id + '/clocks'
     os.mkdir(clock_path)
 
+    # Creeare director pentru imagini poligoane
+    polygon_path = 'images/' + user_id + '/polygons'
+    os.mkdir(polygon_path)
+
 
 def save_posts_images(data):
     """

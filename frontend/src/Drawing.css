@@ -5,8 +5,15 @@
   flex-direction: column;
 }
 
-.drawing-canvas {
+.drawing-canvas-clock {
   background-image: url(images/clock.png);
+  height: 500px;
+  width: 500px;
+  margin: auto;
+}
+
+.drawing-canvas-polygon {
+  background-image: url(images/polygon_base_white.png);
   height: 500px;
   width: 500px;
   margin: auto;

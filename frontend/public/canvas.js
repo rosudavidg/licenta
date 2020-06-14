@@ -19,7 +19,7 @@ function draw() {
     c.fillStyle = colour;
     // start a path and paint a circle of 20 pixels at the mouse position
     c.beginPath();
-    c.arc(mouseX, mouseY, 3, 0, Math.PI * 2, true);
+    c.arc(mouseX, mouseY, 2.5, 0, Math.PI * 2, true);
     c.closePath();
     c.fill();
   }

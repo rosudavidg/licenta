@@ -78,6 +78,12 @@ INSERT INTO question_types (name, answer_type)
     FROM answer_types
     WHERE answer_types.name = 'image';
 
+-- Intrebare poligon
+INSERT INTO question_types (name, answer_type)
+    SELECT 'polygon', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'image';
+
 -- Intrebare te tip oras natal
 INSERT INTO question_types (name, answer_type)
     SELECT 'hometown', answer_types.id

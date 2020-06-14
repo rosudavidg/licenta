@@ -34,7 +34,8 @@ const Drawing = (props) => {
         <script src="canvas.js" type="text/javascript" />
       </Helmet>
       <div className="drawing-area">
-        <canvas className="drawing-canvas" />
+        {props.type === "clock" && <canvas className="drawing-canvas-clock" />}
+        {props.type === "polygon" && <canvas className="drawing-canvas-polygon" />}
       </div>
       <div className="drawing-submit-button" onClick={answerDrawing}>
         Trimite

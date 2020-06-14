@@ -589,3 +589,18 @@ def set_correct_clock(connection, path, correct):
         connection.rollback()
 
     cursor.close()
+
+
+def set_correct_polygon(connection, path, correct):
+    cursor = connection.cursor()
+
+    sql = ("UPDATE answers_polygon SET correct = %s WHERE path = %s")
+    val = (correct, path)
+
+    try:
+        cursor.execute(sql, val)
+        connection.commit()
+    except:
+        connection.rollback()
+
+    cursor.close()

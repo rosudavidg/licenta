@@ -147,9 +147,12 @@ const create = async (userId) => {
   // Adauga intrebare despre bani (adunare)
   question_types.push("money");
 
+  // Adauga intrebare despre poligon
+  question_types.push("polygon");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "change";
+  question_type = "clock";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -309,6 +312,9 @@ const createByType = async (userId, type) => {
       break;
     case "clock":
       await createClock(userId);
+      break;
+    case "polygon":
+      await createPolygon(userId);
       break;
     case "hometown":
       await createHometown(userId);
@@ -501,6 +507,16 @@ const createClock = async (userId) => {
     type,
     userId,
     "Desenează un ceas care indică ora 10:15!",
+  ]);
+};
+
+const createPolygon = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'polygon'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Unește punctele ca în imagine!",
   ]);
 };
 
@@ -1158,6 +1174,17 @@ const postClock = async (img, imgPath) => {
   return response.data;
 };
 
+const postPolygon = async (img, imgPath) => {
+  const host = process.env.BACKEND_DATA_HOST;
+  const port = process.env.BACKEND_DATA_PORT;
+  const path = `/polygon?path=${imgPath}`;
+
+  // Cerere catre backend-data pentru a afisa imaginea cu bounding box
+  const response = await axios.post(`http://${host}:${port}${path}`, { img: img });
+
+  return response.data;
+};
+
 const getTrafficSign = async (trafficSignId) => {
   const host = process.env.BACKEND_DATA_HOST;
   const port = process.env.BACKEND_DATA_PORT;
@@ -1294,6 +1321,9 @@ const getActiveQuestion = async (userId) => {
       break;
     case "clock":
       question["type"] = "clock";
+      break;
+    case "polygon":
+      question["type"] = "polygon";
       break;
     case "hometown":
       question["type"] = "text";
@@ -2407,6 +2437,19 @@ const answerClock = async (questionId, img, userId) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerPolygon = async (questionId, img, userId) => {
+  // Adauga raspunsul in baza de date
+  await query("INSERT INTO answers_polygon (question_id, path) VALUES ($1, $2)", [
+    questionId,
+    `/images/${userId}/polygons/${questionId}.png`,
+  ]);
+
+  postPolygon(img, `/images/${userId}/polygons/${questionId}.png`);
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const image = async (questionId, img, userId) => {
   const questionType = (
     await query("SELECT t.name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE q.id = $1", [
@@ -2417,6 +2460,9 @@ const image = async (questionId, img, userId) => {
   switch (questionType) {
     case "clock":
       await answerClock(questionId, img, userId);
+      break;
+    case "polygon":
+      await answerPolygon(questionId, img, userId);
       break;
   }
 };

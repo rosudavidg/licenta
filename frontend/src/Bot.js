@@ -257,9 +257,10 @@ const Bot = () => {
                   <img className="bot-message-images" src={`data:image/png;base64,${question.images[1]}`} />
                 </div>
               )}
+              {question.type == "polygon" && <img className="bot-message-image" src="./polygon_white.png" />}
               <div className="bot-message-text">{question.message}</div>
             </div>
-            {question.type !== "clock" && (
+            {question.type !== "clock" && question.type !== "polygon" && (
               <div className="bot-answer">
                 <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
                 {question.type === "date" && <DateComponent question={question} setQuestion={setQuestion} />}
@@ -274,7 +275,13 @@ const Bot = () => {
             {question.type === "clock" && (
               <div className="bot-answer-drawing">
                 <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
-                <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} />
+                <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} type="clock" />
+              </div>
+            )}
+            {question.type === "polygon" && (
+              <div className="bot-answer-drawing">
+                <img className="bot-answer-icon" src={`data:image/jpeg;base64,${getProfilepic()}`} />
+                <Drawing question={question} setQuestion={setQuestion} getQuestion={getQuestion} type="polygon" />
               </div>
             )}
           </>

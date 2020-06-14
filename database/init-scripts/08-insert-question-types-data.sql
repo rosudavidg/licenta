@@ -215,3 +215,15 @@ INSERT INTO question_types (name, answer_type)
     SELECT 'sisters_follow_up', answer_types.id
     FROM answer_types
     WHERE answer_types.name = 'text';
+
+-- Intrebare despre animale de companie
+INSERT INTO question_types (name, answer_type)
+    SELECT 'pets', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'choice';
+
+-- Intrebare despre animale de companie (cate animale)
+INSERT INTO question_types (name, answer_type)
+    SELECT 'pets_follow_up', answer_types.id
+    FROM answer_types
+    WHERE answer_types.name = 'text';

@@ -871,6 +871,20 @@ CREATE TABLE IF NOT EXISTS answers_sisters (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Raspunsurile utilizatorilor drespre animale de companie
+CREATE TABLE IF NOT EXISTS answers_pets (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Raspunsul utilizatorului
+    answer TEXT,
+    -- Valoarea raspunsului
+    value BOOLEAN NOT NULL,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
+
 -- Raspunsurile utilizatorilor drespre copii (follow up - cati copii)
 CREATE TABLE IF NOT EXISTS answers_children_follow_up (
     -- Id
@@ -907,6 +921,17 @@ CREATE TABLE IF NOT EXISTS answers_sisters_follow_up (
     created_time TIMESTAMP DEFAULT NOW()
 );
 
+-- Raspunsurile utilizatorilor drespre animale (follow up - cate animale)
+CREATE TABLE IF NOT EXISTS answers_pets_follow_up (
+    -- Id
+    id SERIAL PRIMARY KEY,
+    -- Intrebarea
+    question_id INTEGER REFERENCES questions(id),
+    -- Valoarea raspunsului
+    count INTEGER,
+    -- Data la care a fost adaugat raspunsul
+    created_time TIMESTAMP DEFAULT NOW()
+);
 
 -- Raspunsurile utilizatorilor la intrebarile despre directie
 CREATE TABLE IF NOT EXISTS answers_directional (

@@ -135,9 +135,12 @@ const create = async (userId) => {
   // Adauga intrebare - are surori
   question_types.push("sisters");
 
+  // Adauga intrebare - are animale de companie
+  question_types.push("pets");
+
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  question_type = "sisters";
+  question_type = "pets";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -352,6 +355,9 @@ const createByType = async (userId, type) => {
     case "sisters":
       await createSisters(userId);
       break;
+    case "pets":
+      await createPets(userId);
+      break;
   }
 };
 
@@ -456,6 +462,16 @@ const createSisters = async (userId) => {
   await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Ai surori?"]);
 };
 
+const createPets = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'pets'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Ai animale de companie?",
+  ]);
+};
+
 const createChildrenFollowUp = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'children_follow_up'"))[0]["id"];
 
@@ -472,6 +488,16 @@ const createSistersFollowUp = async (userId) => {
   const type = (await query("SELECT * FROM question_types WHERE name = 'sisters_follow_up'"))[0]["id"];
 
   await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [type, userId, "Câte surori ai?"]);
+};
+
+const createPetsFollowUp = async (userId) => {
+  const type = (await query("SELECT * FROM question_types WHERE name = 'pets_follow_up'"))[0]["id"];
+
+  await query("INSERT INTO questions (type, user_id, message) VALUES ($1, $2, $3)", [
+    type,
+    userId,
+    "Câte animale de companie ai?",
+  ]);
 };
 
 const createHometown = async (userId) => {
@@ -1197,6 +1223,10 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "choice";
       question["choices"] = ["Da", "Nu"];
       break;
+    case "pets":
+      question["type"] = "choice";
+      question["choices"] = ["Da", "Nu"];
+      break;
     case "children_follow_up":
       question["type"] = "text";
       break;
@@ -1204,6 +1234,9 @@ const getActiveQuestion = async (userId) => {
       question["type"] = "text";
       break;
     case "sisters_follow_up":
+      question["type"] = "text";
+      break;
+    case "pets_follow_up":
       question["type"] = "text";
       break;
     case "book":
@@ -1603,6 +1636,9 @@ const choose = async (questionId, choice, userId) => {
     case "sisters":
       await answerSisters(questionId, choice, userId);
       break;
+    case "pets":
+      await answerPets(questionId, choice, userId);
+      break;
     case "day_or_night":
       await answerDayOrNight(questionId, choice);
       break;
@@ -1874,6 +1910,19 @@ const answerSistersFollowUp = async (questionId, answer) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerPetsFollowUp = async (questionId, answer) => {
+  if (!isNaN(answer)) {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_pets_follow_up (question_id, count) VALUES ($1, $2)", [
+      questionId,
+      Number(answer),
+    ]);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerLocation = async (questionId, answer, userId) => {
   // Extrage orasul natal
   const realLocation = (await query("SELECT location FROM users WHERE id = $1", [userId]))[0]["location"];
@@ -1971,6 +2020,22 @@ const answerSisters = async (questionId, answer, userId) => {
   await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
 };
 
+const answerPets = async (questionId, answer, userId) => {
+  if (answer === "Nu") {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_pets (question_id, answer, value) VALUES ($1, $2, TRUE)", [questionId, answer]);
+  } else {
+    // Adaug raspunsul
+    await query("INSERT INTO answers_pets (question_id, answer, value) VALUES ($1, $2, FALSE)", [questionId, answer]);
+
+    // Adauga intrebare follow-up
+    await createPetsFollowUp(userId, questionId);
+  }
+
+  // Marcheaza intrebarea drept raspunsa
+  await query("UPDATE questions SET answered = TRUE WHERE id = $1", [questionId]);
+};
+
 const answerBook = async (questionId, answer) => {
   await query("INSERT INTO answers_book (question_id, value) VALUES ($1, $2)", [questionId, answer === "Da"]);
 
@@ -2044,6 +2109,9 @@ const answer = async (questionId, answer, userId) => {
       break;
     case "sisters_follow_up":
       await answerSistersFollowUp(questionId, answer, userId);
+      break;
+    case "pets_follow_up":
+      await answerPetsFollowUp(questionId, answer, userId);
       break;
   }
 };

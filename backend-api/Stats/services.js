@@ -14,6 +14,7 @@ const getMatchingTag = async (tags, word) => {
 };
 
 const hasEnoughNewAnswers = async (userId, lastDate) => {
+  return true;
   // Verificare intrebari common words
   const common_words_count = (
     await query(
@@ -234,6 +235,10 @@ const hasEnoughNewAnswers = async (userId, lastDate) => {
 
     if (movies_count < 3) return false;
   }
+
+  // TODO: adauga cerinte pentru noile intrebari
+
+  // TODO: modifica numarul de raspunsuri necesare la 1
 
   return true;
 };
@@ -874,6 +879,485 @@ const computeFaceAcc = async (userId, startDate) => {
   return sum / count;
 };
 
+const computeDayOrNight = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_day_or_night a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_day_or_night a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeTrafficLight = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_traffic_light a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_traffic_light a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeDirectional = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_directional a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_directional a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeYear = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_year a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_year a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeReversedWord = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_reversed_word a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_reversed_word a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeChange = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_change a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_change a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeNextLetter = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_next_letter a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_next_letter a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computePrevLetter = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_prev_letter a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_prev_letter a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeChildren = async (userId, startDate) => {
+  // Calculare numar de raspunsuri pozitive
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_children a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.value = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_children a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  if (correct < total / 2) return (total - correct) / total;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeBrothers = async (userId, startDate) => {
+  // Calculare numar de raspunsuri pozitive
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_brothers a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.value = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_brothers a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  if (correct < total / 2) return (total - correct) / total;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeSisters = async (userId, startDate) => {
+  // Calculare numar de raspunsuri pozitive
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_sisters a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.value = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_sisters a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  if (correct < total / 2) return (total - correct) / total;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computePets = async (userId, startDate) => {
+  // Calculare numar de raspunsuri pozitive
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_pets a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.value = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_pets a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  if (correct < total / 2) return (total - correct) / total;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeChildrenFollowUp = async (userId, startDate) => {
+  const totalCount = (
+    await query(
+      "SELECT COUNT(*) FROM answers_children_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (totalCount == 0) return undefined;
+
+  const averageCount = (
+    await query(
+      "SELECT count(*) as cnt FROM answers_children_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 GROUP BY count ORDER BY cnt DESC LIMIT 1",
+      [userId, startDate]
+    )
+  )[0]["cnt"];
+
+  return averageCount / totalCount;
+};
+
+const computeBrothersFollowUp = async (userId, startDate) => {
+  const totalCount = (
+    await query(
+      "SELECT COUNT(*) FROM answers_brothers_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (totalCount == 0) return undefined;
+
+  const averageCount = (
+    await query(
+      "SELECT count(*) as cnt FROM answers_brothers_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 GROUP BY count ORDER BY cnt DESC LIMIT 1",
+      [userId, startDate]
+    )
+  )[0]["cnt"];
+
+  return averageCount / totalCount;
+};
+
+const computeSistersFollowUp = async (userId, startDate) => {
+  const totalCount = (
+    await query(
+      "SELECT COUNT(*) FROM answers_sisters_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (totalCount == 0) return undefined;
+
+  const averageCount = (
+    await query(
+      "SELECT count(*) as cnt FROM answers_sisters_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 GROUP BY count ORDER BY cnt DESC LIMIT 1",
+      [userId, startDate]
+    )
+  )[0]["cnt"];
+
+  return averageCount / totalCount;
+};
+
+const computePetsFollowUp = async (userId, startDate) => {
+  const averageCount = (
+    await query(
+      "SELECT count(*) as cnt FROM answers_pets_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 GROUP BY count ORDER BY cnt DESC LIMIT 1",
+      [userId, startDate]
+    )
+  )[0]["cnt"];
+
+  const totalCount = (
+    await query(
+      "SELECT COUNT(*) FROM answers_pets_follow_up a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (totalCount == 0) return undefined;
+
+  return averageCount / totalCount;
+};
+
+const computeColors = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_colors a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_colors a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeSubtraction = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_subtraction a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_subtraction a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeMoney = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_money a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_money a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computePolygon = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_polygon a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_polygon a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
+const computeMaze = async (userId, startDate) => {
+  // Calculare numar de raspunsuri corecte
+  const correct = (
+    await query(
+      "SELECT COUNT(*) FROM answers_maze a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2 AND a.correct = TRUE",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  // Calculare numar de raspunsuri totale
+  const total = (
+    await query(
+      "SELECT COUNT(*) FROM answers_maze a JOIN questions q ON a.question_id = q.id WHERE q.user_id = $1 AND q.created_time::date >= $2",
+      [userId, startDate]
+    )
+  )[0]["count"];
+
+  if (total == 0) return undefined;
+
+  // Calculare precizie
+  return correct / total;
+};
+
 const createStats = async (userId, statsId, startDate) => {
   const accCommonWords = await computeCommonWordsAcc(userId, startDate);
   const accFace = await computeFaceAcc(userId, startDate);
@@ -893,8 +1377,38 @@ const createStats = async (userId, statsId, startDate) => {
   const accPost = await computePostAcc(userId, startDate);
   const accBook = await computeBookAcc(userId, startDate);
   const accMovie = await computeMovieAcc(userId, startDate);
+  const accDayOrNight = await computeDayOrNight(userId, startDate);
+  const accTrafficLight = await computeTrafficLight(userId, startDate);
+  const accDirectional = await computeDirectional(userId, startDate);
+  const accYear = await computeYear(userId, startDate);
+  const accReversedWord = await computeReversedWord(userId, startDate);
+  const accChange = await computeChange(userId, startDate);
+  const accNextLetter = await computeNextLetter(userId, startDate);
+  const accPrevLetter = await computePrevLetter(userId, startDate);
+  const accChildren = await computeChildren(userId, startDate);
+  const accBrothers = await computeBrothers(userId, startDate);
+  const accSisters = await computeSisters(userId, startDate);
+  const accPets = await computePets(userId, startDate);
+  const accChildrenFollowUp = await computeChildrenFollowUp(userId, startDate);
+  const accBrothersFollowUp = await computeBrothersFollowUp(userId, startDate);
+  const accSistersFollowUp = await computeSistersFollowUp(userId, startDate);
+  const accPetsFollowUp = await computePetsFollowUp(userId, startDate);
+  const accColors = await computeColors(userId, startDate);
+  const accSubtraction = await computeSubtraction(userId, startDate);
+  const accMoney = await computeMoney(userId, startDate);
+  const accPolygon = await computePolygon(userId, startDate);
+  const accMaze = await computeMaze(userId, startDate);
 
-  const accShortTermMemory = average([accCommonWords, accMemoryGame]);
+  const accShortTermMemory = average([
+    accCommonWords,
+    accMemoryGame,
+    accReversedWord,
+    accChange,
+    accSubtraction,
+    accMoney,
+    accPolygon,
+    accMaze,
+  ]);
   const accLongTermMemory = average([
     accFace,
     accSeason,
@@ -912,6 +1426,21 @@ const createStats = async (userId, statsId, startDate) => {
     accPost,
     accBook,
     accMovie,
+    accDayOrNight,
+    accTrafficLight,
+    accDirectional,
+    accYear,
+    accNextLetter,
+    accPrevLetter,
+    accChildren,
+    accBrothers,
+    accSisters,
+    accPets,
+    accChildrenFollowUp,
+    accBrothersFollowUp,
+    accSistersFollowUp,
+    accPetsFollowUp,
+    accColors,
   ]);
 
   const accTotal = average([
@@ -933,11 +1462,32 @@ const createStats = async (userId, statsId, startDate) => {
     accPost,
     accBook,
     accMovie,
+    accDayOrNight,
+    accTrafficLight,
+    accDirectional,
+    accYear,
+    accReversedWord,
+    accChange,
+    accNextLetter,
+    accPrevLetter,
+    accChildren,
+    accBrothers,
+    accSisters,
+    accPets,
+    accChildrenFollowUp,
+    accBrothersFollowUp,
+    accSistersFollowUp,
+    accPetsFollowUp,
+    accColors,
+    accSubtraction,
+    accMoney,
+    accPolygon,
+    accMaze,
   ]);
 
   // Actualizeaza rezultatele in baza de date
   await query(
-    "UPDATE stats SET ready = TRUE, acc_total = $1, acc_short_term_memory = $2, acc_long_term_memory = $3, acc_common_words = $4, acc_face = $5, acc_season = $6, acc_today = $7,  acc_traffic_sign = $8, acc_birthday = $9, acc_today_date = $10, acc_animals = $11, acc_memory_game = $12, acc_dices = $13, acc_clock = $14, acc_hometown = $15, acc_location = $16, acc_language = $17, acc_music_genre = $18, acc_post = $19, acc_book = $20, acc_movie = $21 WHERE id = $22",
+    "UPDATE stats SET ready = TRUE, acc_total = $1, acc_short_term_memory = $2, acc_long_term_memory = $3, acc_common_words = $4, acc_face = $5, acc_season = $6, acc_today = $7,  acc_traffic_sign = $8, acc_birthday = $9, acc_today_date = $10, acc_animals = $11, acc_memory_game = $12, acc_dices = $13, acc_clock = $14, acc_hometown = $15, acc_location = $16, acc_language = $17, acc_music_genre = $18, acc_post = $19, acc_book = $20, acc_movie = $21, acc_day_or_night = $22, acc_traffic_light = $23, acc_directional = $24, acc_year = $25, acc_reversed_word = $26, acc_change = $27, acc_next_letter = $28, acc_prev_letter = $29, acc_children = $30, acc_brothers = $31, acc_sisters = $32, acc_pets = $33, acc_children_follow_up = $34, acc_brothers_follow_up = $35, acc_sisters_follow_up = $36, acc_pets_follow_up = $37, acc_colors = $38, acc_subtraction = $39, acc_money = $40, acc_polygon = $41, acc_maze = $42 WHERE id = $43",
     [
       accTotal,
       accShortTermMemory,
@@ -960,6 +1510,27 @@ const createStats = async (userId, statsId, startDate) => {
       accPost,
       accBook,
       accMovie,
+      accDayOrNight,
+      accTrafficLight,
+      accDirectional,
+      accYear,
+      accReversedWord,
+      accChange,
+      accNextLetter,
+      accPrevLetter,
+      accChildren,
+      accBrothers,
+      accSisters,
+      accPets,
+      accChildrenFollowUp,
+      accBrothersFollowUp,
+      accSistersFollowUp,
+      accPetsFollowUp,
+      accColors,
+      accSubtraction,
+      accMoney,
+      accPolygon,
+      accMaze,
       statsId,
     ]
   );

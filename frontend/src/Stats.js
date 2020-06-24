@@ -234,6 +234,27 @@ const Periodic = (props) => {
               "Postări",
               "Cărți",
               "Filme",
+              "Zi sau noapte",
+              "Semafor",
+              "Indicator orientare",
+              "Anul curent",
+              "Scrierea unui cuvânt invers",
+              "Problemă rest magazin",
+              "Litera următoare in alfabet",
+              "Litera anterioară in alfabet",
+              "Întrebări copii",
+              "Întrebări frați",
+              "Întrebări surori",
+              "Întrebări animale de companie",
+              "Întrebări număr copii",
+              "Întrebări număr frați",
+              "Întrebări număr surori",
+              "Întrebări număr animale de companie",
+              "Recunoaștere culori",
+              "Scăderi succesive",
+              "Adunări",
+              "Desenare poligon",
+              "Problemă labirint",
             ],
 
             datasets: [
@@ -258,6 +279,27 @@ const Periodic = (props) => {
                   Math.round(stats[index]["acc_post"] * 100),
                   Math.round(stats[index]["acc_book"] * 100),
                   Math.round(stats[index]["acc_movie"] * 100),
+                  Math.round(stats[index]["acc_day_or_night"] * 100),
+                  Math.round(stats[index]["acc_traffic_light"] * 100),
+                  Math.round(stats[index]["acc_directional"] * 100),
+                  Math.round(stats[index]["acc_year"] * 100),
+                  Math.round(stats[index]["acc_reversed_word"] * 100),
+                  Math.round(stats[index]["acc_change"] * 100),
+                  Math.round(stats[index]["acc_next_letter"] * 100),
+                  Math.round(stats[index]["acc_prev_letter"] * 100),
+                  Math.round(stats[index]["acc_children"] * 100),
+                  Math.round(stats[index]["acc_brothers"] * 100),
+                  Math.round(stats[index]["acc_sisters"] * 100),
+                  Math.round(stats[index]["acc_pets"] * 100),
+                  Math.round(stats[index]["acc_children_follow_up"] * 100),
+                  Math.round(stats[index]["acc_brothers_follow_up"] * 100),
+                  Math.round(stats[index]["acc_sisters_follow_up"] * 100),
+                  Math.round(stats[index]["acc_pets_follow_up"] * 100),
+                  Math.round(stats[index]["acc_colors"] * 100),
+                  Math.round(stats[index]["acc_subtraction"] * 100),
+                  Math.round(stats[index]["acc_money"] * 100),
+                  Math.round(stats[index]["acc_polygon"] * 100),
+                  Math.round(stats[index]["acc_maze"] * 100),
                 ],
                 backgroundColor: "#cdd1c4",
                 hoverBackgroundColor: "#4e8098",
@@ -358,6 +400,29 @@ const Evolution = (props) => {
   const accPost = props.stats.map((e) => Math.round(e["acc_post"] * 100));
   const accBook = props.stats.map((e) => Math.round(e["acc_book"] * 100));
   const accMovie = props.stats.map((e) => Math.round(e["acc_movie"] * 100));
+
+  const accDayOrNight = props.stats.map((e) => Math.round(e["acc_day_or_night"] * 100));
+  const accTrafficLight = props.stats.map((e) => Math.round(e["acc_traffic_light"] * 100));
+  const accDirectional = props.stats.map((e) => Math.round(e["acc_directional"] * 100));
+  const accYear = props.stats.map((e) => Math.round(e["acc_year"] * 100));
+  const accReversedWord = props.stats.map((e) => Math.round(e["acc_reversed_word"] * 100));
+  const accChange = props.stats.map((e) => Math.round(e["acc_change"] * 100));
+  const accNextLetter = props.stats.map((e) => Math.round(e["acc_next_letter"] * 100));
+  const accPrevLetter = props.stats.map((e) => Math.round(e["acc_prev_letter"] * 100));
+  const accChildren = props.stats.map((e) => Math.round(e["acc_children"] * 100));
+  const accBrothers = props.stats.map((e) => Math.round(e["acc_brothers"] * 100));
+  const accSisters = props.stats.map((e) => Math.round(e["acc_sisters"] * 100));
+  const accPets = props.stats.map((e) => Math.round(e["acc_pets"] * 100));
+  const accChildrenFollowUp = props.stats.map((e) => Math.round(e["acc_children_follow_up"] * 100));
+  const accBrothersFollowUp = props.stats.map((e) => Math.round(e["acc_brothers_follow_up"] * 100));
+  const accSistersFollowUp = props.stats.map((e) => Math.round(e["acc_sisters_follow_up"] * 100));
+  const accPetsFollowUp = props.stats.map((e) => Math.round(e["acc_pets_follow_up"] * 100));
+  const accColors = props.stats.map((e) => Math.round(e["acc_colors"] * 100));
+  const accSubtraction = props.stats.map((e) => Math.round(e["acc_subtraction"] * 100));
+  const accMoney = props.stats.map((e) => Math.round(e["acc_money"] * 100));
+  const accPolygon = props.stats.map((e) => Math.round(e["acc_polygon"] * 100));
+  const accMaze = props.stats.map((e) => Math.round(e["acc_maze"] * 100));
+
   const intervals = props.stats.map(
     (e) =>
       `${new Date(e["start_date"]).toLocaleDateString("ro", { timezone: "UTC" })}-${new Date(
@@ -388,6 +453,28 @@ const Evolution = (props) => {
       <EvolutionChart title="Postări" intervals={intervals} data={accPost} />
       <EvolutionChart title="Cărți" intervals={intervals} data={accBook} />
       <EvolutionChart title="Filme" intervals={intervals} data={accMovie} />
+
+      <EvolutionChart title="Zi sau noapte" intervals={intervals} data={accDayOrNight} />
+      <EvolutionChart title="Semafoar" intervals={intervals} data={accTrafficLight} />
+      <EvolutionChart title="Indicator orientare" intervals={intervals} data={accDirectional} />
+      <EvolutionChart title="Anul curent" intervals={intervals} data={accYear} />
+      <EvolutionChart title="Scrierea unui cuvânt invers" intervals={intervals} data={accReversedWord} />
+      <EvolutionChart title="Problemă rest magazin" intervals={intervals} data={accChange} />
+      <EvolutionChart title="Litera următoare in alfabet" intervals={intervals} data={accNextLetter} />
+      <EvolutionChart title="Litera anterioară in alfabet" intervals={intervals} data={accPrevLetter} />
+      <EvolutionChart title="Întrebări copii" intervals={intervals} data={accChildren} />
+      <EvolutionChart title="Întrebări frați" intervals={intervals} data={accBrothers} />
+      <EvolutionChart title="Întrebări surori" intervals={intervals} data={accSisters} />
+      <EvolutionChart title="Întrebări animale de companie" intervals={intervals} data={accPets} />
+      <EvolutionChart title="Întrebări număr copii" intervals={intervals} data={accChildrenFollowUp} />
+      <EvolutionChart title="Întrebări număr frați" intervals={intervals} data={accBrothersFollowUp} />
+      <EvolutionChart title="Întrebări număr surori" intervals={intervals} data={accSistersFollowUp} />
+      <EvolutionChart title="Întrebări număr animale de companie" intervals={intervals} data={accPetsFollowUp} />
+      <EvolutionChart title="Recunoaștere culori" intervals={intervals} data={accColors} />
+      <EvolutionChart title="Scăderi succesive" intervals={intervals} data={accSubtraction} />
+      <EvolutionChart title="Adunări" intervals={intervals} data={accMoney} />
+      <EvolutionChart title="Desenare poligon" intervals={intervals} data={accPolygon} />
+      <EvolutionChart title="Problemă labirint" intervals={intervals} data={accMaze} />
     </>
   );
 };

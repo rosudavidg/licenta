@@ -74,22 +74,6 @@ const Home = () => {
         <div className="home-message">
           <p>Salut, {getFirstName()}!</p>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id libero ultricies, pretium risus id,
-            vulputate ex. Donec consequat eget lacus quis venenatis. Morbi quis lorem ut sapien ultricies laoreet ut eu
-            urna. Nullam posuere mollis lobortis. Sed vitae nisi vitae nisl dapibus malesuada a vel nisi. Vestibulum
-            ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec metus nulla, vestibulum
-            id scelerisque at, scelerisque quis velit. Nunc ullamcorper congue varius. Donec vitae finibus metus. Donec
-            venenatis tempus massa, et gravida sem tempus nec. Vivamus rhoncus magna nec suscipit feugiat.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id libero ultricies, pretium risus id,
-            vulputate ex. Donec consequat eget lacus quis venenatis. Morbi quis lorem ut sapien ultricies laoreet ut eu
-            urna. Nullam posuere mollis lobortis. Sed vitae nisi vitae nisl dapibus malesuada a vel nisi. Vestibulum
-            ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec metus nulla, vestibulum
-            id scelerisque at, scelerisque quis velit. Nunc ullamcorper congue varius. Donec vitae finibus metus. Donec
-            venenatis tempus massa, et gravida sem tempus nec. Vivamus rhoncus magna nec suscipit feugiat.
-          </p>
-          <p>
             {ready && (
               <>
                 {!statsAvailability && (

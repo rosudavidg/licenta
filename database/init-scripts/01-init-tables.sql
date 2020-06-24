@@ -1162,5 +1162,47 @@ CREATE TABLE IF NOT EXISTS stats (
     -- Acuratete - carti
     acc_book FLOAT,
     -- Acuratete - filme
-    acc_movie FLOAT
+    acc_movie FLOAT,
+    -- Acuratete - zi sau noapte
+    acc_day_or_night FLOAT,
+    -- Acuratete - semafor
+    acc_traffic_light FLOAT,
+    -- Acuratete - indicatoare directionale
+    acc_directional FLOAT,
+    -- Acuratete - anul curent
+    acc_year FLOAT,
+    -- Acuratete - cuvant invers
+    acc_reversed_word FLOAT,
+    -- Acuratete - rest
+    acc_change FLOAT,
+    -- Acuratete - litera urmatoare
+    acc_next_letter FLOAT,
+    -- Acuratete - lietera anterioara
+    acc_prev_letter FLOAT,
+    -- Acuratete - copii
+    acc_children FLOAT,
+    -- Acuratete - frati
+    acc_brothers FLOAT,
+    -- Acuratete - surori
+    acc_sisters FLOAT,
+    -- Acuratete - animale de companie
+    acc_pets FLOAT,
+    -- Acuratete - copii (cati)
+    acc_children_follow_up FLOAT,
+    -- Acuratete - frati (cati)
+    acc_brothers_follow_up FLOAT,
+    -- Acuratete - surori (cate)
+    acc_sisters_follow_up FLOAT,
+    -- Acuratete - animale de companie (cate)
+    acc_pets_follow_up FLOAT,
+    -- Acuratete - culori
+    acc_colors FLOAT,
+    -- Acuratete - scaderi succesive
+    acc_subtraction FLOAT,
+    -- Acuratete - adunare bani
+    acc_money FLOAT,
+    -- Acuratete - desene poligon
+    acc_polygon FLOAT,
+    -- Acuratete - joc labirint
+    acc_maze FLOAT
 );

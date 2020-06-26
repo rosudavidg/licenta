@@ -77,6 +77,24 @@ services:
       - "54321:5432"
     networks:
       - webnetwork
+  email:
+    image: rosudavidg/avatario-email:latest
+    environment:
+      EMAIL_ADDRESS: /run/secrets/secret_email_address
+      EMAIL_PASSWORD: /run/secrets/secret_email_password
+      DATABASE_USER: /run/secrets/secret_database_user
+      DATABASE_HOST: database
+      DATABASE_PASSWORD: /run/secrets/secret_database_password
+      DATABASE_NAME: /run/secrets/secret_database_db
+      DATABASE_PORT: 5432
+    secrets:
+      - secret_email_address
+      - secret_email_password
+      - secret_database_user
+      - secret_database_password
+      - secret_database_db
+    networks:
+      - webnetwork
 networks:
   webnetwork:
 volumes:
@@ -91,3 +109,7 @@ secrets:
     file: ./secrets/secret_database_db
   secret_jwt_key:
     file: ./secrets/secret_jwt_key
+  secret_email_address:
+    file: ./secrets/secret_email_address
+  secret_email_password:
+    file: ./secrets/secret_email_password

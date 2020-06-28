@@ -105,8 +105,6 @@ services:
       - secret_database_db
     networks:
       - webnetwork
-    volumes:
-      - ./email:/usr/src/app/
 networks:
   webnetwork:
 volumes:

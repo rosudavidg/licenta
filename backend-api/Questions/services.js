@@ -155,7 +155,7 @@ const create = async (userId) => {
 
   // Selecteaza random un tip de intrebare
   question_type = question_types[Math.floor(Math.random() * question_types.length)];
-  // question_type = "clock";
+  // question_type = "memory_game";
 
   // Creeaza o noua intrebare
   await createByType(userId, question_type);
@@ -1293,7 +1293,7 @@ const getMatchingTag = async (tags, word) => {
 const getActiveQuestion = async (userId) => {
   const question = (
     await query(
-      "SELECT q.id, message, name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE user_id = $1 AND answered = FALSE",
+      "SELECT q.id, message, name as type FROM questions q JOIN question_types t ON q.type = t.id WHERE user_id = $1 AND answered = FALSE ORDER BY q.id ASC",
       [userId]
     )
   )[0];

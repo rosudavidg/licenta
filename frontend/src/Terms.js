@@ -29,7 +29,7 @@ const Terms = (props) => {
           </p>
           <p>Salut!</p>
           <p>Bine ai venit pe Avatario!</p>
-          <p>TODO: implement me</p>
+          <p style={{ color: "red" }}>TODO: GDPR</p>
           {!accepted && (
             <div className="terms-button" onClick={onClickAccept}>
               Accept!

@@ -1596,7 +1596,9 @@ const availableStats = async (userId) => {
 };
 
 const getStats = async (userId) => {
-  const stats = await query("SELECT * FROM stats WHERE user_id = $1 AND ready = TRUE ORDER BY id ASC", [userId]);
+  const stats = await query("SELECT * FROM stats WHERE user_id = $1 AND ready = TRUE ORDER BY start_date ASC", [
+    userId,
+  ]);
 
   if (stats.length == 0) {
     throw new ServerError("Cannot find stats.", 400);

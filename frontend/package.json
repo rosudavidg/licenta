@@ -15,7 +15,7 @@
     "helmet": "^3.22.0",
     "jwt-decode": "^2.2.0",
     "konva": "^6.0.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.9.0",
     "react-dom": "^16.13.1",
